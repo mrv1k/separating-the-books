@@ -13,9 +13,10 @@ interface Book {
   id: string;
 }
 
-const db: Book[] = [{ title: "Sundering", id: "0" }];
+let db: Book[] = [{ title: "Sundering", id: "0" }];
+
 function getOne({ id }: { id: string }) {
-  return db.find((book) => book.id == id);
+  return db.find((book) => book.id === id);
 }
 
 app.get("/", (_req, res) => {
@@ -38,6 +39,12 @@ app.post("/", (req, res) => {
   res.status(201).send(db);
 });
 
+app.get("/:id", (req, res) => {
+  const { id } = req.params;
+  const result = getOne({ id });
+  if (!result) return res.status(404);
+});
+
 app.put("/:id", (req, res) => {
   const {
     body: { title },
@@ -47,7 +54,7 @@ app.put("/:id", (req, res) => {
   }
   const { id } = req.params;
   const result = getOne({ id });
-  if (!result) res.status(404);
+  if (!result) return res.status(404);
 
   const updatedBook = Object.assign({}, result, { title });
   db[Number(id)] = updatedBook;
@@ -56,14 +63,14 @@ app.put("/:id", (req, res) => {
 });
 
 app.delete("/:id", (req, res) => {
-  console.log("delete");
-});
-
-app.get("/:id", (req, res) => {
   const { id } = req.params;
 
   const result = getOne({ id });
-  if (!result) res.status(404);
+  if (!result) return res.status(404);
+
+  console.log(db);
+  db = db.filter((book) => book.id !== result.id);
+  console.log(db);
   res.json(result);
 });
 

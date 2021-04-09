@@ -19,6 +19,15 @@ app.get("/", (_req, res) => {
   res.send(db);
 });
 
+app.get("/:id", (req, res) => {
+  const { id } = req.params;
+  const query = db.find((book) => book.id === id);
+
+  if (!query) res.status(404);
+
+  res.json(query);
+});
+
 app.post("/", (req, res) => {
   const { body }: { body: { title?: string } } = req;
 
@@ -34,6 +43,7 @@ app.post("/", (req, res) => {
   db.push(book);
   res.status(201).send(db);
 });
+
 /**
  * CRUD
  * CREATE - POST

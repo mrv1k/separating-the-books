@@ -14,18 +14,12 @@ interface Book {
 }
 
 const db: Book[] = [{ title: "Sundering", id: "0" }];
+function getOne({ id }: { id: string }) {
+  return db.find((book) => book.id == id);
+}
 
 app.get("/", (_req, res) => {
   res.send(db);
-});
-
-app.get("/:id", (req, res) => {
-  const { id } = req.params;
-  const query = db.find((book) => book.id === id);
-
-  if (!query) res.status(404);
-
-  res.json(query);
 });
 
 app.post("/", (req, res) => {
@@ -42,6 +36,22 @@ app.post("/", (req, res) => {
 
   db.push(book);
   res.status(201).send(db);
+});
+
+app.put("/:id", (req, res) => {
+  console.log("put");
+});
+
+app.delete("/:id", (req, res) => {
+  console.log("delete");
+});
+
+app.get("/:id", (req, res) => {
+  const { id } = req.params;
+
+  const result = getOne({ id });
+  if (!result) res.status(404);
+  res.json(result);
 });
 
 /**

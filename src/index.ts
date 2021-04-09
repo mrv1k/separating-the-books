@@ -39,7 +39,20 @@ app.post("/", (req, res) => {
 });
 
 app.put("/:id", (req, res) => {
-  console.log("put");
+  const {
+    body: { title },
+  }: { body: { title?: string } } = req;
+  if (!title || title === "") {
+    return res.status(422).send("Parameter 'title' is required.");
+  }
+  const { id } = req.params;
+  const result = getOne({ id });
+  if (!result) res.status(404);
+
+  const updatedBook = Object.assign({}, result, { title });
+  db[Number(id)] = updatedBook;
+
+  res.json({ url: req.url });
 });
 
 app.delete("/:id", (req, res) => {

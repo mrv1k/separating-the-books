@@ -39,22 +39,26 @@ app.post("/", (req, res) => {
   res.status(201).send(db);
 });
 
-app.get("/:id", (req, res) => {
+app.get("/:id", (req, res, next) => {
   const { id } = req.params;
   const result = getOne({ id });
-  if (!result) return res.status(404);
+
+  if (!result) return next();
+  res.send(result);
 });
 
-app.put("/:id", (req, res) => {
+app.put("/:id", (req, res, next) => {
+  const { id } = req.params;
+  const result = getOne({ id });
+  if (!result) return next();
+
   const {
     body: { title },
   }: { body: { title?: string } } = req;
+
   if (!title || title === "") {
     return res.status(422).send("Parameter 'title' is required.");
   }
-  const { id } = req.params;
-  const result = getOne({ id });
-  if (!result) return res.status(404);
 
   const updatedBook = Object.assign({}, result, { title });
   db[Number(id)] = updatedBook;
@@ -62,11 +66,10 @@ app.put("/:id", (req, res) => {
   res.json({ url: req.url });
 });
 
-app.delete("/:id", (req, res) => {
+app.delete("/:id", (req, res, next) => {
   const { id } = req.params;
-
   const result = getOne({ id });
-  if (!result) return res.status(404);
+  if (!result) return next();
 
   console.log(db);
   db = db.filter((book) => book.id !== result.id);
@@ -74,13 +77,10 @@ app.delete("/:id", (req, res) => {
   res.json(result);
 });
 
-/**
- * CRUD
- * CREATE - POST
- * READ - GET
- * UPDATE - PUT
- * DELETE - DELETE
- */
+app.use((req, res) => {
+  res.status(404);
+  res.json({ error: "No, can do" });
+});
 
 app.listen(PORT, () => {
   console.log(`Listening on port http://localhost:${PORT}`);

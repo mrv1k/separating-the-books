@@ -14,68 +14,65 @@ interface Book {
 
 let db: Book[] = [{ title: "Sundering", id: "0" }];
 
-function getOne({ id }: { id: string }) {
-  return db.find((book) => book.id === id);
+function getOne(id: string) {
+  return db.find((book) => book.id === id) || false;
 }
 
-app.get("/", (_req, res) => {
-  res.send(db);
+app
+  .route("/")
+  .get((_req, res) => {
+    res.send(db);
+  })
+  .post((req, res) => {
+    // returns HTTP status code 201 (Created).
+    // The URI of the new resource is included in the Location header of the response.
+    // the response body contains a representation of the resource.
+    const { body }: { body: { title?: string } } = req;
+
+    if (!body.title || body.title === "") {
+      return res.status(422).send("Parameter 'title' is required.");
+    }
+
+    const book: Book = {
+      title: body.title,
+      id: db.length.toString(),
+    };
+
+    db.push(book);
+    res.status(201).send(db);
+  });
+
+app.param("id", (req, res, next, id) => {
+  const book = getOne(id);
+  if (!book) return next("route");
+  res.locals.book = book;
+  next();
 });
 
-// returns HTTP status code 201 (Created).
-// The URI of the new resource is included in the Location header of the response.
-// the response body contains a representation of the resource.
-app.post("/", (req, res) => {
-  const { body }: { body: { title?: string } } = req;
+app
+  .route("/:id")
+  .get((req, res) => {
+    res.send(res.locals.book);
+  })
+  .put((req, res) => {
+    const {
+      body: { title },
+    }: { body: { title?: string } } = req;
 
-  if (!body.title || body.title === "") {
-    return res.status(422).send("Parameter 'title' is required.");
-  }
+    if (!title || title === "") {
+      return res.status(422).send("Parameter 'title' is required.");
+    }
 
-  const book: Book = {
-    title: body.title,
-    id: db.length.toString(),
-  };
+    // TODO: add response when object was already updated
+    const updatedBook = Object.assign({}, res.locals.book, { title });
+    db[Number(res.locals.book.id)] = updatedBook;
 
-  db.push(book);
-  res.status(201).send(db);
-});
-
-app.get("/:id", (req, res, next) => {
-  const { id } = req.params;
-  const result = getOne({ id });
-  if (!result) return next();
-
-  res.send(result);
-});
-
-app.put("/:id", (req, res, next) => {
-  const { id } = req.params;
-  const result = getOne({ id });
-  if (!result) return next();
-
-  const {
-    body: { title },
-  }: { body: { title?: string } } = req;
-
-  if (!title || title === "") {
-    return res.status(422).send("Parameter 'title' is required.");
-  }
-
-  const updatedBook = Object.assign({}, result, { title });
-  db[Number(id)] = updatedBook;
-
-  res.json({ url: req.url });
-});
-
-app.delete("/:id", (req, res, next) => {
-  const { id } = req.params;
-  const result = getOne({ id });
-  if (!result) return next();
-
-  db = db.filter((book) => book.id !== result.id);
-  res.status(204).json(result);
-});
+    res.json({ url: req.url });
+  })
+  .delete((req, res) => {
+    db = db.filter((book) => book.id !== res.locals.book.id);
+    res.status(204).json(res.locals.book);
+  });
 
 app.use((req, res) => {
   res.status(404);

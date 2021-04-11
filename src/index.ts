@@ -1,4 +1,4 @@
-import express from "express";
+import express, { RequestHandler } from "express";
 import cors from "cors";
 
 const app = express();
@@ -12,29 +12,39 @@ interface Book {
   id: string;
 }
 
+interface BookPayload {
+  title?: string;
+}
+
 let db: Book[] = [{ title: "Sundering", id: "0" }];
 
 function getOne(id: string) {
   return db.find((book) => book.id === id) || false;
 }
 
+const bookPayloadValidation: RequestHandler = (req, res, next) => {
+  const { title }: BookPayload = req.body;
+
+  if (typeof title === "undefined") {
+    return res.status(400).json({ error: "Parameter 'title' is required" });
+  } else if (title === "") {
+    return res.status(422).json({ error: "Parameter 'title' is invalid" });
+  }
+  res.locals.title = title;
+  next();
+};
+
 app
   .route("/")
   .get((_req, res) => {
     res.send(db);
   })
-  .post((req, res) => {
+  .post(bookPayloadValidation, (req, res) => {
     // returns HTTP status code 201 (Created).
     // The URI of the new resource is included in the Location header of the response.
     // the response body contains a representation of the resource.
-    const { body }: { body: { title?: string } } = req;
-
-    if (!body.title || body.title === "") {
-      return res.status(422).send("Parameter 'title' is required.");
-    }
-
     const book: Book = {
-      title: body.title,
+      title: res.locals.title,
       id: db.length.toString(),
     };
 
@@ -54,17 +64,10 @@ app
   .get((req, res) => {
     res.send(res.locals.book);
   })
-  .put((req, res) => {
-    const {
-      body: { title },
-    }: { body: { title?: string } } = req;
-
-    if (!title || title === "") {
-      return res.status(422).send("Parameter 'title' is required.");
-    }
-
+  .put(bookPayloadValidation, (req, res) => {
+    const { book, title } = res.locals;
     // TODO: add response when object was already updated
-    const updatedBook = Object.assign({}, res.locals.book, { title });
+    const updatedBook = Object.assign({}, book, { title });
     db[Number(res.locals.book.id)] = updatedBook;
 
     res.json({ url: req.url });

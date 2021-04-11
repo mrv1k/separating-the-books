@@ -1,11 +1,10 @@
 import express from "express";
-import { json } from "body-parser";
 import cors from "cors";
 
 const app = express();
 const PORT = 3000;
 
-app.use(json());
+app.use(express.json());
 app.use(cors());
 
 interface Book {
@@ -23,6 +22,9 @@ app.get("/", (_req, res) => {
   res.send(db);
 });
 
+// returns HTTP status code 201 (Created).
+// The URI of the new resource is included in the Location header of the response.
+// the response body contains a representation of the resource.
 app.post("/", (req, res) => {
   const { body }: { body: { title?: string } } = req;
 
@@ -42,8 +44,8 @@ app.post("/", (req, res) => {
 app.get("/:id", (req, res, next) => {
   const { id } = req.params;
   const result = getOne({ id });
-
   if (!result) return next();
+
   res.send(result);
 });
 
@@ -71,10 +73,8 @@ app.delete("/:id", (req, res, next) => {
   const result = getOne({ id });
   if (!result) return next();
 
-  console.log(db);
   db = db.filter((book) => book.id !== result.id);
-  console.log(db);
-  res.json(result);
+  res.status(204).json(result);
 });
 
 app.use((req, res) => {

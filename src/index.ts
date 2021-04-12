@@ -85,3 +85,5 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`Listening on port http://localhost:${PORT}`);
 });
+
+export default app;

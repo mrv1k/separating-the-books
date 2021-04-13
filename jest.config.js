@@ -7,5 +7,6 @@ module.exports = {
   transform: {
     "^.+\\.(ts)$": "ts-jest",
   },
-  slowTestDurationThreshold: 10,
+  // slowTestDurationThreshold: 10,
+  slowTestThreshold: 10,
 };

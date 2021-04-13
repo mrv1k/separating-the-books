@@ -28,15 +28,20 @@ describe("/api/books", () => {
 
     test("POST create a new book", async () => {
       const newBook = { title: "Wawawewa" };
-
       await request.post("/api/books").send(newBook).expect(201);
-
       expect(db).toContainEqual(expect.objectContaining(newBook));
     });
   });
 
   describe("/:id", () => {
-    it.todo("GET");
+    test("GET returns 1 book", async () => {
+      const dbFirstBook = db[0];
+      const response = await request.get("/api/books/0");
+      expect(response.body).toStrictEqual(dbFirstBook);
+    });
+    test("GET gives 404 on unknown id", async () => {
+      await request.get("/api/books/wrong_id").expect(404);
+    });
     it.todo("PUT");
     it.todo("DELETE");
   });

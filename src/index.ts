@@ -7,19 +7,8 @@ const PORT = 3000;
 app.use(express.json());
 app.use(cors());
 
-interface Book {
-  title: string;
-  id: string;
-}
-
 interface BookPayload {
   title?: string;
-}
-
-let db: Book[] = [{ title: "Sundering", id: "0" }];
-
-function getOne(id: string) {
-  return db.find((book) => book.id === id) || false;
 }
 
 const bookPayloadValidation: RequestHandler = (req, res, next) => {
@@ -82,8 +71,8 @@ app.use((req, res) => {
   res.json({ error: "No, can do" });
 });
 
-app.listen(PORT, () => {
-  console.log(`Listening on port http://localhost:${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Listening on port http://localhost:${PORT}`);
+// });
 
 export default app;

@@ -1,15 +1,12 @@
 import express, { RequestHandler } from "express";
 import cors from "cors";
+import { db, getBookById, Book, BookPayload } from "./db";
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
 app.use(cors());
-
-interface BookPayload {
-  title?: string;
-}
 
 const bookPayloadValidation: RequestHandler = (req, res, next) => {
   const { title }: BookPayload = req.body;
@@ -42,7 +39,7 @@ app
   });
 
 app.param("id", (req, res, next, id) => {
-  const book = getOne(id);
+  const book = getBookById(id);
   if (!book) return next("route");
   res.locals.book = book;
   next();
@@ -60,11 +57,11 @@ app
     db[Number(res.locals.book.id)] = updatedBook;
 
     res.json({ url: req.url });
-  })
-  .delete((req, res) => {
-    db = db.filter((book) => book.id !== res.locals.book.id);
-    res.status(204).json(res.locals.book);
   });
+// .delete((req, res) => {
+//   db = db.filter((book) => book.id !== res.locals.book.id);
+//   res.status(204).json(res.locals.book);
+// });
 
 app.use((req, res) => {
   res.status(404);

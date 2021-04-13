@@ -3,7 +3,7 @@ import { app } from "../app";
 import { db } from "../db";
 
 describe("/api/books", () => {
-  it("GET /", async () => {
+  it("returns all books on GET /", async () => {
     const booksRes = await supertest(app)
       .get("/api/books")
       .expect("Content-Type", /json/)

@@ -10,7 +10,11 @@ export interface BookPayload {
   title?: string;
 }
 
-export const db: Book[] = [{ title: "Sundering", id: "0" }];
+export const db: Book[] = [
+  { title: "The Well of Eternity", id: "0" },
+  { title: "The Demon Soul", id: "1" },
+  { title: "The Sundering", id: "2" },
+];
 
 export function getBookById(id: string): Book | undefined {
   return db.find((book) => book.id === id);

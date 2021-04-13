@@ -1,12 +1,8 @@
-import express, { RequestHandler } from "express";
-import cors from "cors";
-import { db, getBookById, Book, BookPayload } from "./db";
+import { Router } from "express";
+import { RequestHandler } from "express";
+import { db, getBookById, Book, BookPayload } from "../db";
 
-const app = express();
-const PORT = 3000;
-
-app.use(express.json());
-app.use(cors());
+const router = Router();
 
 const bookPayloadValidation: RequestHandler = (req, res, next) => {
   const { title }: BookPayload = req.body;
@@ -20,7 +16,7 @@ const bookPayloadValidation: RequestHandler = (req, res, next) => {
   next();
 };
 
-app
+router
   .route("/")
   .get((_req, res) => {
     res.send(db);
@@ -38,14 +34,14 @@ app
     res.status(201).send(db);
   });
 
-app.param("id", (req, res, next, id) => {
+router.param("id", (req, res, next, id) => {
   const book = getBookById(id);
   if (!book) return next("route");
   res.locals.book = book;
   next();
 });
 
-app
+router
   .route("/:id")
   .get((req, res) => {
     res.send(res.locals.book);
@@ -63,13 +59,4 @@ app
 //   res.status(204).json(res.locals.book);
 // });
 
-app.use((req, res) => {
-  res.status(404);
-  res.json({ error: "No, can do" });
-});
-
-// app.listen(PORT, () => {
-//   console.log(`Listening on port http://localhost:${PORT}`);
-// });
-
-export default app;
+export default router;

@@ -1,10 +1,10 @@
-import request from "supertest";
-import myapp from "../index";
+import supertest from "supertest";
+import { app } from "../app";
 
-describe("/books", () => {
+describe("/api/books", () => {
   it("GET /", (done) => {
-    const r = request(myapp);
-    const get = r.get("/");
+    const r = supertest(app);
+    const get = r.get("/api/books");
 
     get.expect("Content-Type", /json/).expect(200, done);
   });

@@ -1,6 +1,7 @@
-import express from "express";
+import express, { ErrorRequestHandler } from "express";
 import cors from "cors";
 import winston from "winston";
+import createError from "http-errors";
 import expressWinston from "express-winston";
 import debug from "debug";
 import booksRouter from "./routes/books";
@@ -28,10 +29,24 @@ app.use(cors());
 
 app.use("/api/books", booksRouter);
 
-app.use((req, res) => {
-  res.status(404);
-  res.json({ error: "No, can do" });
+app.use((req, res, next) => {
+  next(createError(404, "No, can do"));
 });
+
+const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
+  debugLog("Error status:", err.status);
+  debugLog("Error message:", err.message);
+  debugLog("Error stack:", err.stack);
+  debugLog("reqapp", req.app.get("env"));
+  // res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.status(err.status || 500);
+  res.json({
+    status: err.status || 500,
+    message: err.message,
+    stack: err.stack.split("\n"),
+  });
+};
+app.use(errorHandler);
 
 const server = () => {
   // fix for: "Jest has detected the following 1 open handle potentially keeping Jest from exiting"

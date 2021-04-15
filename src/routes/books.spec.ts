@@ -1,6 +1,6 @@
 import supertest from "supertest";
 import { app } from "../app";
-import { db } from "../db";
+import { inMemoryDB } from "../db";
 
 /** @name supertest https://github.com/visionmedia/supertest#api
  * @function .expect(status[,fn]) - Assert response status code.
@@ -21,21 +21,21 @@ describe("/api/books", () => {
       const booksRes = await request
         .get("/api/books")
         .expect("Content-Type", /json/)
-        .expect(200, db);
+        .expect(200, inMemoryDB);
 
-      expect(booksRes.body).toMatchObject(db);
+      expect(booksRes.body).toMatchObject(inMemoryDB);
     });
 
     test("POST create a new book", async () => {
       const newBook = { title: "Wawawewa" };
       await request.post("/api/books").send(newBook).expect(201);
-      expect(db).toContainEqual(expect.objectContaining(newBook));
+      expect(inMemoryDB).toContainEqual(expect.objectContaining(newBook));
     });
   });
 
   describe("/:id", () => {
     test("GET returns 1 book", async () => {
-      const dbFirstBook = db[0];
+      const dbFirstBook = inMemoryDB[0];
       const response = await request.get("/api/books/0");
       expect(response.body).toStrictEqual(dbFirstBook);
     });

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { RequestHandler } from "express";
-import { db, getBookById, Book, BookPayload } from "../db";
+import { inMemoryDB, getBookById, Book, BookPayload } from "../db";
 
 const router = Router();
 
@@ -19,7 +19,7 @@ const bookPayloadValidation: RequestHandler = (req, res, next) => {
 router
   .route("/")
   .get((_req, res) => {
-    res.send(db);
+    res.send(inMemoryDB);
   })
   .post(bookPayloadValidation, (req, res) => {
     // returns HTTP status code 201 (Created).
@@ -27,11 +27,11 @@ router
     // the response body contains a representation of the resource.
     const book: Book = {
       title: res.locals.title,
-      id: db.length.toString(),
+      id: inMemoryDB.length.toString(),
     };
 
-    db.push(book);
-    res.status(201).send(db);
+    inMemoryDB.push(book);
+    res.status(201).send(inMemoryDB);
   });
 
 router.param("id", (req, res, next, id) => {
@@ -50,12 +50,12 @@ router
     const { book, title } = res.locals;
     // TODO: add response when object was already updated
     const updatedBook = Object.assign({}, book, { title });
-    db[Number(res.locals.book.id)] = updatedBook;
+    inMemoryDB[Number(res.locals.book.id)] = updatedBook;
 
     res.json({ url: req.url });
   });
 // .delete((req, res) => {
-//   db = db.filter((book) => book.id !== res.locals.book.id);
+//   inMemoryDB = inMemoryDB.filter((book) => book.id !== res.locals.book.id);
 //   res.status(204).json(res.locals.book);
 // });
 

@@ -1,11 +1,16 @@
 import { Router } from "express";
 import { RequestHandler } from "express";
-import { inMemoryDB, getBookById, Book, BookPayload } from "../db";
+import {
+  inMemoryDB,
+  getBookById,
+  InMemoryBook,
+  InMemoryBookPayload,
+} from "../in-memory-db";
 
 const router = Router();
 
 const bookPayloadValidation: RequestHandler = (req, res, next) => {
-  const { title }: BookPayload = req.body;
+  const { title }: InMemoryBookPayload = req.body;
 
   if (typeof title === "undefined") {
     return res.status(400).json({ error: "Parameter 'title' is required" });
@@ -25,7 +30,7 @@ router
     // returns HTTP status code 201 (Created).
     // The URI of the new resource is included in the Location header of the response.
     // the response body contains a representation of the resource.
-    const book: Book = {
+    const book: InMemoryBook = {
       title: res.locals.title,
       id: inMemoryDB.length.toString(),
     };

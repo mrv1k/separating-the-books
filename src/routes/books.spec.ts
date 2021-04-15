@@ -1,6 +1,6 @@
 import supertest from "supertest";
 import { app } from "../app";
-import { inMemoryDB } from "../db";
+import { inMemoryDB } from "../in-memory-db";
 
 /** @name supertest https://github.com/visionmedia/supertest#api
  * @function .expect(status[,fn]) - Assert response status code.

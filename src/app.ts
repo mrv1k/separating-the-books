@@ -6,6 +6,8 @@ import expressWinston from "express-winston";
 import debug from "debug";
 import booksRouter from "./routes/books";
 
+import "./db";
+
 const app = express();
 
 const debugLog = debug("app");

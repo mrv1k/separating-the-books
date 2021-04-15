@@ -7,4 +7,8 @@ const BookSchema = new Schema({
   authors: [{ type: Schema.Types.ObjectId, ref: "Author", required: true }],
 });
 
+BookSchema.virtual("url").get(function () {
+  return "authors/" + this._id;
+});
+
 export default mongoose.model("BookSchema", BookSchema);

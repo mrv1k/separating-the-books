@@ -1,14 +1,14 @@
-import { model, Document, Schema, Model } from "mongoose";
+import mongoose, { Document, Model, Schema } from "mongoose";
 import { IAuthor } from "./author";
 
 export interface IBook extends Document {
   title: string;
   subtitle?: string;
   pageCount: number;
-  authors: IAuthor[];
+  authors: IAuthor["_id"];
 }
 
-const BookSchema = new Schema({
+const BookSchema = new mongoose.Schema({
   title: { type: String, required: true, maxLength: 100 },
   subtitle: { type: String, maxLength: 100 },
   pageCount: { type: Number, required: true, min: 0, max: 32666 },
@@ -16,9 +16,9 @@ const BookSchema = new Schema({
 });
 
 BookSchema.virtual("url").get(function (this: IBook) {
-  return "authors/" + this._id;
+  return "/api/books/" + this._id;
 });
 
-const Book: Model<IBook> = model("BookSchema", BookSchema);
+const Book: Model<IBook> = mongoose.model("BookSchema", BookSchema);
 
 export default Book;

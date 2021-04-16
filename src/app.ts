@@ -6,7 +6,15 @@ import expressWinston from "express-winston";
 import debug from "debug";
 import booksRouter from "./routes/books";
 
-import "./db";
+import launchMongoDB from "./db";
+import Author from "./models/author";
+
+async function test() {
+  await launchMongoDB();
+  const query = await Author.findOne({ last_name: "Knaak" });
+  console.log(query);
+}
+test();
 
 const app = express();
 

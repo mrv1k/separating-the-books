@@ -2,26 +2,32 @@ import Author from "./models/author";
 import Book from "./models/book";
 import mongoose from "mongoose";
 
-(async function () {
+export default async function launchMongoDB(): Promise<mongoose.Connection> {
   const mongoDB = "mongodb://localhost:27017/separating_the_books";
   await mongoose.connect(mongoDB, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
-  const db = mongoose.connection;
-  db.on("error", console.error.bind(console, "MongoDB connection error:"));
+
+  mongoose.connection.once("open", function () {
+    console.log("MongoDB Connection open:", mongoDB);
+  });
+
+  mongoose.connection.on(
+    "error",
+    console.error.bind(console, "MongoDB connection error:")
+  );
 
   const author = await Author.create({
     first_name: "Richard",
     last_name: "Knaak",
   });
 
-  const book = await Book.create({
+  await Book.create({
     title: "The Well of Eternity",
     pageCount: 370,
-    authors: [author],
+    authors: [author._id],
   });
 
-  const query = await Author.findOne({ last_name: "Knaak" });
-  console.log(query);
-})();
+  return mongoose.connection;
+}

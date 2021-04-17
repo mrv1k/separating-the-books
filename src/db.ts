@@ -10,7 +10,7 @@ export default async function launchMongoDB(): Promise<mongoose.Connection> {
   });
 
   mongoose.connection.once("open", function () {
-    console.log("MongoDB Connection open:", mongoDB);
+    console.log("test test, do you copy? open", mongoDB);
   });
 
   mongoose.connection.on(
@@ -18,16 +18,16 @@ export default async function launchMongoDB(): Promise<mongoose.Connection> {
     console.error.bind(console, "MongoDB connection error:")
   );
 
-  const author = await Author.create({
-    first_name: "Richard",
-    last_name: "Knaak",
-  });
+  // const author = await Author.create({
+  //   first_name: "Richard",
+  //   last_name: "Knaak",
+  // });
 
-  await Book.create({
-    title: "The Well of Eternity",
-    pageCount: 370,
-    authors: [author._id],
-  });
+  // await Book.create({
+  //   title: "The Well of Eternity",
+  //   pageCount: 370,
+  //   authors: [author._id],
+  // });
 
   return mongoose.connection;
 }

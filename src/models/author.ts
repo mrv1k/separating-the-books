@@ -18,6 +18,6 @@ AuthorSchema.virtual("url").get(function (this: IAuthor) {
   return "/api/authors/" + this._id;
 });
 
-const Author: Model<IAuthor> = mongoose.model("AuthorSchema", AuthorSchema);
+const Author: Model<IAuthor> = mongoose.model("Author", AuthorSchema);
 
 export default Author;

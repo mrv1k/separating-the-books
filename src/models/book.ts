@@ -19,6 +19,6 @@ BookSchema.virtual("url").get(function (this: IBook) {
   return "/api/books/" + this._id;
 });
 
-const Book: Model<IBook> = mongoose.model("BookSchema", BookSchema);
+const Book: Model<IBook> = mongoose.model("Book", BookSchema);
 
 export default Book;

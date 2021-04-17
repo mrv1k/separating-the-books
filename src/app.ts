@@ -14,8 +14,10 @@ async function test() {
   const query = await Author.findOne({ last_name: "Knaak" });
   console.log(query);
 }
-test();
 
+if (process.env.NODE_ENV !== "test") {
+  test();
+}
 const app = express();
 
 const debugLog = debug("app");

@@ -7,6 +7,8 @@ import {
   InMemoryBookPayload,
 } from "../in-memory-db";
 
+import Book from "../models/book";
+
 const router = Router();
 
 const bookPayloadValidation: RequestHandler = (req, res, next) => {
@@ -23,8 +25,12 @@ const bookPayloadValidation: RequestHandler = (req, res, next) => {
 
 router
   .route("/")
-  .get((_req, res) => {
-    res.send(inMemoryDB);
+  .get(async (_req, res) => {
+    const books = await Book.find({}, "-_id authors title pageCount")
+      .populate("authors", "-_id first_name last_name")
+      .exec();
+
+    res.send(books);
   })
   .post(bookPayloadValidation, (req, res) => {
     // returns HTTP status code 201 (Created).

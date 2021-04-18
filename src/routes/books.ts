@@ -32,17 +32,25 @@ router
 
     res.send(books);
   })
-  .post(bookPayloadValidation, (req, res) => {
-    // returns HTTP status code 201 (Created).
-    // The URI of the new resource is included in the Location header of the response.
-    // the response body contains a representation of the resource.
-    const book: InMemoryBook = {
-      title: res.locals.title,
-      id: inMemoryDB.length.toString(),
-    };
+  .post(bookPayloadValidation, async (req, res, next) => {
+    const filter = { title: res.locals.title };
+    const book = await Book.findOneAndUpdate(
+      filter,
+      {},
+      { returnOriginal: false, upsert: true, rawResult: true }
+    );
 
-    inMemoryDB.push(book);
-    res.status(201).send(inMemoryDB);
+    if (book.ok && book.value) {
+      const existed: boolean = book.lastErrorObject.updatedExisting;
+      const id: string = book.value.id;
+
+      // const url = `${req.originalUrl}/${id}`;
+      // TODO: setting header breaks 303 response
+      // .location(url)
+      return res.status(existed ? 303 : 201).json({ id });
+    }
+
+    next();
   });
 
 router.param("id", (req, res, next, id) => {

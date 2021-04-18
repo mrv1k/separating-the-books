@@ -7,6 +7,7 @@ export default async function launchMongoDB(): Promise<mongoose.Connection> {
   await mongoose.connect(mongoDB, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useFindAndModify: false,
   });
 
   mongoose.connection.once("open", function () {

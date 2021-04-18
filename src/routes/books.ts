@@ -63,14 +63,15 @@ router
   });
 
 router.param("id", async (req, res, next, id) => {
-  if (!isValidObjectId(id)) {
-    return res.send(createError(400, "temporary, incorrect id"));
-  }
+  if (!isValidObjectId(id)) next("route");
 
-  const book = await Book.findById(id);
-  if (book === null) return next("route");
-  res.locals.book = book;
-  next();
+  try {
+    const book = await Book.findById(id).lean();
+    res.locals.book = book;
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 router

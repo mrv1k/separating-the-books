@@ -7,6 +7,8 @@ import {
   InMemoryBookPayload,
 } from "../in-memory-db";
 
+import createError from "http-errors";
+import { isValidObjectId } from "mongoose";
 import Book from "../models/book";
 
 const router = Router();
@@ -42,20 +44,31 @@ router
 
     if (book.ok && book.value) {
       const existed: boolean = book.lastErrorObject.updatedExisting;
-      const id: string = book.value.id;
+      const id: string = book.value._id;
 
-      // const url = `${req.originalUrl}/${id}`;
+      const url = `${req.originalUrl}/${id}`;
+      // console.log();
+      // console.log(book.value);
+      // console.log(url);
       // TODO: setting header breaks 303 response
-      // .location(url)
-      return res.status(existed ? 303 : 201).json({ id });
+      return (
+        res
+          // .location(url)
+          .status(existed ? 303 : 201)
+          .json({ id })
+      );
     }
 
     next();
   });
 
-router.param("id", (req, res, next, id) => {
-  const book = getBookById(id);
-  if (!book) return next("route");
+router.param("id", async (req, res, next, id) => {
+  if (!isValidObjectId(id)) {
+    return res.send(createError(400, "temporary, incorrect id"));
+  }
+
+  const book = await Book.findById(id);
+  if (book === null) return next("route");
   res.locals.book = book;
   next();
 });

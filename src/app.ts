@@ -4,20 +4,11 @@ import winston from "winston";
 import createError from "http-errors";
 import expressWinston from "express-winston";
 import debug from "debug";
+import launchMongoDB from "./db";
 import booksRouter from "./routes/books";
 
-import launchMongoDB from "./db";
-import Author from "./models/author";
+launchMongoDB();
 
-async function test() {
-  await launchMongoDB();
-  const query = await Author.findOne({ last_name: "Knaak" });
-  console.log(query);
-}
-
-if (process.env.NODE_ENV !== "test") {
-  test();
-}
 const app = express();
 
 const debugLog = debug("app");

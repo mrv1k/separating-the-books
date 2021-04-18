@@ -1,6 +1,6 @@
-import Author from "./models/author";
-import Book from "./models/book";
 import mongoose from "mongoose";
+import "./models/author";
+import "./models/book";
 
 export default async function launchMongoDB(): Promise<mongoose.Connection> {
   const mongoDB = "mongodb://localhost:27017/separating_the_books";

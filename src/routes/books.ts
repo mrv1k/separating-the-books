@@ -28,8 +28,9 @@ const bookPayloadValidation: RequestHandler = (req, res, next) => {
 router
   .route("/")
   .get(async (_req, res) => {
-    const books = await Book.find({}, "-_id authors title pageCount")
-      .populate("authors", "-_id first_name last_name")
+    const books = await Book.find({}, { _id: 0, __v: 0 })
+      .lean()
+      .populate("authors", { _id: 0, __v: 0 })
       .exec();
 
     res.send(books);
@@ -66,7 +67,7 @@ router.param("id", async (req, res, next, id) => {
   if (!isValidObjectId(id)) next("route");
 
   try {
-    const book = await Book.findById(id).lean();
+    const book = await Book.findById(id, { __v: 0 }).lean();
     res.locals.book = book;
     next();
   } catch (error) {

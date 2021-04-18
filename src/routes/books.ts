@@ -47,17 +47,10 @@ router
       const existed: boolean = book.lastErrorObject.updatedExisting;
       const id: string = book.value._id;
 
-      const url = `${req.originalUrl}/${id}`;
-      // console.log();
-      // console.log(book.value);
-      // console.log(url);
-      // TODO: setting header breaks 303 response
-      return (
-        res
-          // .location(url)
-          .status(existed ? 303 : 201)
-          .json({ id })
-      );
+      return res
+        .location(`${req.originalUrl}/${id}`)
+        .status(existed ? 303 : 201)
+        .json({ id });
     }
 
     next();

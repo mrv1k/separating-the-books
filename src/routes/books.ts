@@ -30,23 +30,32 @@ router
   })
   .post(bookPayloadValidation, async (req, res, next) => {
     const filter = { title: res.locals.title };
-    const book = await Book.findOneAndUpdate(
+    const rawBook = await Book.findOneAndUpdate(
       filter,
       {},
       { returnOriginal: false, upsert: true, rawResult: true }
     );
 
-    if (book.ok && book.value) {
-      const existed: boolean = book.lastErrorObject.updatedExisting;
-      const id: string = book.value._id;
-
-      return res
-        .location(`${req.originalUrl}/${id}`)
-        .status(existed ? 303 : 201)
-        .json({ id });
+    if (rawBook.ok !== 1 || typeof rawBook.value === "undefined") {
+      return next("route");
     }
 
-    next();
+    const existed: boolean = rawBook.lastErrorObject.updatedExisting;
+    const book = rawBook.value;
+    book.__v = undefined;
+
+    const relativeUrl = `${req.originalUrl}/${book._id}`;
+    const absoluteUrl = `${req.protocol}://${req.get("host")}${relativeUrl}`;
+    res.location(absoluteUrl);
+
+    if (existed) {
+      return res.status(409).json({
+        error: "Resource already exists",
+        location: relativeUrl,
+      });
+    }
+
+    return res.status(201).json(book);
   });
 
 router.param("id", (req, res, next, id) => {

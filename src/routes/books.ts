@@ -2,7 +2,7 @@ import { Router } from "express";
 import { RequestHandler } from "express";
 
 import { isValidObjectId } from "mongoose";
-import Book from "../models/book";
+import BookModel from "../models/book";
 
 const router = Router();
 
@@ -21,7 +21,7 @@ const bookPayloadValidation: RequestHandler = (req, res, next) => {
 router
   .route("/")
   .get(async (_req, res) => {
-    const books = await Book.find({}, { _id: 0, __v: 0 })
+    const books = await BookModel.find({}, { _id: 0, __v: 0 })
       .lean()
       .populate("authors", { _id: 0, __v: 0 })
       .exec();
@@ -30,7 +30,7 @@ router
   })
   .post(bookPayloadValidation, async (req, res, next) => {
     const filter = { title: res.locals.title };
-    const rawBook = await Book.findOneAndUpdate(
+    const rawBook = await BookModel.findOneAndUpdate(
       filter,
       {},
       { returnOriginal: false, upsert: true, rawResult: true }
@@ -64,35 +64,35 @@ router.param("id", (req, res, next, id) => {
   next();
 });
 
-router.route("/:id").get(
-  asyncHandler(async (req, res, next) => {
-    const book = await Book.findById(res.locals.id, {
-      __v: 0,
+router
+  .route("/:id")
+  .get(
+    wrap(async (req, res, next) => {
+      const book = await BookModel.findById(res.locals.id, { __v: 0 })
+        .lean()
+        .populate("authors", { __v: 0 });
+      res.json(book);
     })
-      .lean()
-      .populate("authors", { __v: 0 });
-    res.json(book);
-  })
-);
-// .put(bookPayloadValidation, (req, res) => {
-//   const { book, title } = res.locals;
-//   const filter = { title: title };
-// // TODO: add response when object was already updated
-// const updatedBook = Object.assign({}, book, { title });
-// inMemoryDB[Number(res.locals.book.id)] = updatedBook;
-
-// res.json({ url: req.url });
-
-// const book = Book.findOneAndUpdate(filter, book);
-// });
-// .delete((req, res) => {
-//   inMemoryDB = inMemoryDB.filter((book) => book.id !== res.locals.book.id);
-//   res.status(204).json(res.locals.book);
-// });
+  )
+  .put(
+    wrap(async (req, res, next) => {
+      res.send("tbd");
+    })
+  )
+  .patch(
+    wrap(async (req, res, next) => {
+      res.send("tbd");
+    })
+  )
+  .delete(
+    wrap(async (req, res, next) => {
+      res.send("tbd");
+    })
+  );
 
 export default router;
 
-function asyncHandler(fn: RequestHandler): RequestHandler {
+function wrap(fn: RequestHandler): RequestHandler {
   return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 }
 // GET /tickets - Retrieves a list of tickets

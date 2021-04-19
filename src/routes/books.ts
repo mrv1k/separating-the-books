@@ -1,20 +1,13 @@
 import { Router } from "express";
 import { RequestHandler } from "express";
-import {
-  inMemoryDB,
-  getBookById,
-  InMemoryBook,
-  InMemoryBookPayload,
-} from "../in-memory-db";
 
-import createError from "http-errors";
 import { isValidObjectId } from "mongoose";
 import Book from "../models/book";
 
 const router = Router();
 
 const bookPayloadValidation: RequestHandler = (req, res, next) => {
-  const { title }: InMemoryBookPayload = req.body;
+  const { title } = req.body;
 
   if (typeof title === "undefined") {
     return res.status(400).json({ error: "Parameter 'title' is required" });
@@ -56,34 +49,48 @@ router
     next();
   });
 
-router.param("id", async (req, res, next, id) => {
+router.param("id", (req, res, next, id) => {
   if (!isValidObjectId(id)) next("route");
-
-  try {
-    const book = await Book.findById(id, { __v: 0 }).lean();
-    res.locals.book = book;
-    next();
-  } catch (error) {
-    next(error);
-  }
+  res.locals.id = id;
+  next();
 });
 
-router
-  .route("/:id")
-  .get((req, res) => {
-    res.send(res.locals.book);
+router.route("/:id").get(
+  asyncHandler(async (req, res, next) => {
+    const book = await Book.findById(res.locals.id, {
+      __v: 0,
+    })
+      .lean()
+      .populate("authors", { __v: 0 });
+    res.json(book);
   })
-  .put(bookPayloadValidation, (req, res) => {
-    const { book, title } = res.locals;
-    // TODO: add response when object was already updated
-    const updatedBook = Object.assign({}, book, { title });
-    inMemoryDB[Number(res.locals.book.id)] = updatedBook;
+);
+// .put(bookPayloadValidation, (req, res) => {
+//   const { book, title } = res.locals;
+//   const filter = { title: title };
+// // TODO: add response when object was already updated
+// const updatedBook = Object.assign({}, book, { title });
+// inMemoryDB[Number(res.locals.book.id)] = updatedBook;
 
-    res.json({ url: req.url });
-  });
+// res.json({ url: req.url });
+
+// const book = Book.findOneAndUpdate(filter, book);
+// });
 // .delete((req, res) => {
 //   inMemoryDB = inMemoryDB.filter((book) => book.id !== res.locals.book.id);
 //   res.status(204).json(res.locals.book);
 // });
 
 export default router;
+
+function asyncHandler(fn: RequestHandler): RequestHandler {
+  return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
+}
+// GET /tickets - Retrieves a list of tickets
+// GET /tickets/12 - Retrieves a specific ticket
+// POST /tickets - Creates a new ticket
+// PUT /tickets/12 - Updates ticket #12
+// PATCH /tickets/12 - Partially updates ticket #12
+// DELETE /tickets/12 - Deletes ticket #12
+
+// title, pageCount, authors, subtitle?

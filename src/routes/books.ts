@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { RequestHandler } from "express";
-
 import { isValidObjectId } from "mongoose";
+import { wrap } from "../utils/express-helpers";
 import BookModel from "../models/book";
 
 const router = Router();
@@ -127,7 +127,3 @@ router
   );
 
 export default router;
-
-function wrap(fn: RequestHandler): RequestHandler {
-  return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
-}

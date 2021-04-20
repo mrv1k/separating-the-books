@@ -114,7 +114,15 @@ router
   )
   .delete(
     wrap(async (req, res, next) => {
-      res.send("tbd");
+      const filter = { _id: res.locals.id };
+      const book = await BookModel.findOneAndDelete(filter, {
+        projection: { __v: 0 },
+      });
+
+      if (book === null) {
+        return res.status(204).json();
+      }
+      res.json(book);
     })
   );
 
@@ -123,5 +131,3 @@ export default router;
 function wrap(fn: RequestHandler): RequestHandler {
   return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 }
-// PATCH /tickets/12 - Partially updates ticket #12
-// DELETE /tickets/12 - Deletes ticket #12

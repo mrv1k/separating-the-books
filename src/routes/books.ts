@@ -26,7 +26,7 @@ router
 
 router.param("id", (req, res, next, id) => {
   if (!isValidObjectId(id)) next();
-  res.locals.id = id;
+  res.locals._id = id;
   next();
 });
 

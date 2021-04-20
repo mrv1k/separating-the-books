@@ -3,10 +3,9 @@ import BookModel from "../models/book";
 
 class BooksController {
   async getAll(req: Request, res: Response) {
-    const books = await BookModel.find({}, { _id: 0, __v: 0 })
+    const books = await BookModel.find({}, { __v: 0 })
       .lean()
-      .populate("authors", { _id: 0, __v: 0 })
-      .exec();
+      .populate("authors", { __v: 0 });
 
     res.send(books);
   }
@@ -42,7 +41,7 @@ class BooksController {
   }
 
   async getOneById(req: Request, res: Response, next: NextFunction) {
-    const book = await BookModel.findById(res.locals.id, { __v: 0 })
+    const book = await BookModel.findById(res.locals._id, { __v: 0 })
       .lean()
       .populate("authors", { __v: 0 });
 
@@ -56,7 +55,7 @@ class BooksController {
     next: NextFunction
   ) {
     const update = { title: res.locals.title };
-    const rawBook = await BookModel.findByIdAndUpdate(res.locals.id, update, {
+    const rawBook = await BookModel.findByIdAndUpdate(res.locals._id, update, {
       upsert: true,
       rawResult: true,
       returnOriginal: false,
@@ -77,8 +76,9 @@ class BooksController {
   }
 
   async partialUpdateOneById(req: Request, res: Response, next: NextFunction) {
-    const update = { title: res.locals.title };
-    const book = await BookModel.updateOne({ _id: res.locals.id }, update);
+    const { title, _id } = res.locals;
+    const update = { title };
+    const book = await BookModel.updateOne({ _id }, update);
 
     if (book.nModified === 0) {
       return res.status(204).json();
@@ -87,7 +87,7 @@ class BooksController {
   }
 
   async deleteOneById(req: Request, res: Response, next: NextFunction) {
-    const filter = { _id: res.locals.id };
+    const filter = { _id: res.locals._id };
     const book = await BookModel.findOneAndDelete(filter, {
       projection: { __v: 0 },
     });

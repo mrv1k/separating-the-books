@@ -10,7 +10,7 @@ import {
   completeUpdateOrCreateById,
   partialUpdateById,
   deleteOneById,
-} from "../controllers/book-controller";
+} from "../controllers/books";
 
 const router = Router();
 

@@ -101,8 +101,15 @@ router
     })
   )
   .patch(
+    validation,
     wrap(async (req, res, next) => {
-      res.send("tbd");
+      const update = { title: res.locals.title };
+      const book = await BookModel.updateOne({ _id: res.locals.id }, update);
+
+      if (book.nModified === 0) {
+        return res.status(204).json();
+      }
+      res.json({ patched: update });
     })
   )
   .delete(

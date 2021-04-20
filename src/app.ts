@@ -6,9 +6,9 @@ import expressWinston from "express-winston";
 import debug from "debug";
 import launchMongoDB from "./db";
 import booksRouter from "./routes/books";
+import authorsRouter from "./routes/authors";
 
 launchMongoDB();
-
 const app = express();
 
 const debugLog = debug("app");
@@ -31,6 +31,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/books", booksRouter);
+app.use("/api/authors", authorsRouter);
 
 app.use((req, res, next) => {
   next(createError(404, "No, can do"));
@@ -40,7 +41,6 @@ const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   debugLog("Error status:", err.status);
   debugLog("Error message:", err.message);
   debugLog("Error stack:", err.stack);
-  debugLog("reqapp", req.app.get("env"));
   // res.locals.error = req.app.get('env') === 'development' ? err : {};
   res.status(err.status || 500);
   res.json({

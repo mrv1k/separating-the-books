@@ -1,4 +1,4 @@
-import mongoose, { Document, Model } from "mongoose";
+import mongoose, { Document, Model, Types } from "mongoose";
 
 const AuthorSchema = new mongoose.Schema<AuthorDocument, AuthorModel>({
   first_name: { type: String, required: true, maxLength: 100 },
@@ -13,6 +13,7 @@ export interface Author {
 export interface AuthorDocument extends Author, Document {
   name: string;
   url: string;
+  _id: Types.ObjectId;
 }
 
 AuthorSchema.virtual("name").get(function (this: AuthorDocument) {

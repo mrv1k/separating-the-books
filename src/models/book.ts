@@ -14,7 +14,7 @@ export interface Book {
   title: string;
   subtitle?: string;
   pageCount: number;
-  authors: Types.ObjectId | Record<string, unknown>;
+  authors: Types.ObjectId[] | AuthorDocument[] | Record<string, unknown>;
 }
 
 // Mongoose Types, not exported because author field is non deterministic
@@ -23,11 +23,11 @@ interface BookBaseDocument extends Book, Document {
 }
 
 export interface BookDocument extends BookBaseDocument {
-  author: AuthorDocument["_id"];
+  authors: AuthorDocument["_id"][];
 }
 
 export interface BookPopulatedDocument extends BookBaseDocument {
-  author: AuthorDocument;
+  authors: AuthorDocument[];
 }
 
 BookSchema.virtual("url").get(function (this: BookBaseDocument) {

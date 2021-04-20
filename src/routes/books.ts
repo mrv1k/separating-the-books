@@ -6,7 +6,7 @@ import BookModel from "../models/book";
 
 const router = Router();
 
-const bookPayloadValidation: RequestHandler = (req, res, next) => {
+const validation: RequestHandler = (req, res, next) => {
   const { title } = req.body;
 
   if (typeof title === "undefined") {
@@ -28,7 +28,7 @@ router
 
     res.send(books);
   })
-  .post(bookPayloadValidation, async (req, res, next) => {
+  .post(validation, async (req, res, next) => {
     const filter = { title: res.locals.title };
     const rawBook = await BookModel.findOneAndUpdate(
       filter,
@@ -37,7 +37,7 @@ router
     );
 
     if (rawBook.ok !== 1 || typeof rawBook.value === "undefined") {
-      return next("route");
+      return next();
     }
 
     const existed: boolean = rawBook.lastErrorObject.updatedExisting;
@@ -59,7 +59,7 @@ router
   });
 
 router.param("id", (req, res, next, id) => {
-  if (!isValidObjectId(id)) next("route");
+  if (!isValidObjectId(id)) next();
   res.locals.id = id;
   next();
 });
@@ -71,12 +71,33 @@ router
       const book = await BookModel.findById(res.locals.id, { __v: 0 })
         .lean()
         .populate("authors", { __v: 0 });
+
+      if (book === null) return next();
       res.json(book);
     })
   )
   .put(
+    validation,
     wrap(async (req, res, next) => {
-      res.send("tbd");
+      const update = { title: res.locals.title };
+      const rawBook = await BookModel.findByIdAndUpdate(res.locals.id, update, {
+        upsert: true,
+        rawResult: true,
+        returnOriginal: false,
+      }).populate("authors");
+
+      if (rawBook.ok !== 1 || typeof rawBook.value === "undefined") {
+        return next();
+      }
+
+      const existed: boolean = rawBook.lastErrorObject.updatedExisting;
+      const book = rawBook.value;
+      book.__v = undefined;
+      console.log(book.authors);
+
+      if (!existed) res.status(201);
+
+      res.json(book);
     })
   )
   .patch(
@@ -95,11 +116,5 @@ export default router;
 function wrap(fn: RequestHandler): RequestHandler {
   return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 }
-// GET /tickets - Retrieves a list of tickets
-// GET /tickets/12 - Retrieves a specific ticket
-// POST /tickets - Creates a new ticket
-// PUT /tickets/12 - Updates ticket #12
 // PATCH /tickets/12 - Partially updates ticket #12
 // DELETE /tickets/12 - Deletes ticket #12
-
-// title, pageCount, authors, subtitle?

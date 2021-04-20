@@ -2,7 +2,15 @@ import { Router } from "express";
 import { RequestHandler } from "express";
 import { isValidObjectId } from "mongoose";
 import { wrap } from "../utils/express-helpers";
-import BookModel from "../models/book";
+
+import {
+  getAll,
+  createOne,
+  getOneById,
+  completeUpdateOrCreateById,
+  partialUpdateById,
+  deleteOneById,
+} from "../controllers/book-controller";
 
 const router = Router();
 
@@ -18,45 +26,7 @@ const validation: RequestHandler = (req, res, next) => {
   next();
 };
 
-router
-  .route("/")
-  .get(async (_req, res) => {
-    const books = await BookModel.find({}, { _id: 0, __v: 0 })
-      .lean()
-      .populate("authors", { _id: 0, __v: 0 })
-      .exec();
-
-    res.send(books);
-  })
-  .post(validation, async (req, res, next) => {
-    const filter = { title: res.locals.title };
-    const rawBook = await BookModel.findOneAndUpdate(
-      filter,
-      {},
-      { returnOriginal: false, upsert: true, rawResult: true }
-    );
-
-    if (rawBook.ok !== 1 || typeof rawBook.value === "undefined") {
-      return next();
-    }
-
-    const existed: boolean = rawBook.lastErrorObject.updatedExisting;
-    const book = rawBook.value;
-    book.__v = undefined;
-
-    const relativeUrl = `${req.originalUrl}/${book._id}`;
-    const absoluteUrl = `${req.protocol}://${req.get("host")}${relativeUrl}`;
-    res.location(absoluteUrl);
-
-    if (existed) {
-      return res.status(409).json({
-        error: "Resource already exists",
-        location: relativeUrl,
-      });
-    }
-
-    return res.status(201).json(book);
-  });
+router.route("/").get(wrap(getAll)).post(validation, wrap(createOne));
 
 router.param("id", (req, res, next, id) => {
   if (!isValidObjectId(id)) next();
@@ -66,64 +36,9 @@ router.param("id", (req, res, next, id) => {
 
 router
   .route("/:id")
-  .get(
-    wrap(async (req, res, next) => {
-      const book = await BookModel.findById(res.locals.id, { __v: 0 })
-        .lean()
-        .populate("authors", { __v: 0 });
-
-      if (book === null) return next();
-      res.json(book);
-    })
-  )
-  .put(
-    validation,
-    wrap(async (req, res, next) => {
-      const update = { title: res.locals.title };
-      const rawBook = await BookModel.findByIdAndUpdate(res.locals.id, update, {
-        upsert: true,
-        rawResult: true,
-        returnOriginal: false,
-      }).populate("authors");
-
-      if (rawBook.ok !== 1 || typeof rawBook.value === "undefined") {
-        return next();
-      }
-
-      const existed: boolean = rawBook.lastErrorObject.updatedExisting;
-      const book = rawBook.value;
-      book.__v = undefined;
-      console.log(book.authors);
-
-      if (!existed) res.status(201);
-
-      res.json(book);
-    })
-  )
-  .patch(
-    validation,
-    wrap(async (req, res, next) => {
-      const update = { title: res.locals.title };
-      const book = await BookModel.updateOne({ _id: res.locals.id }, update);
-
-      if (book.nModified === 0) {
-        return res.status(204).json();
-      }
-      res.json({ patched: update });
-    })
-  )
-  .delete(
-    wrap(async (req, res, next) => {
-      const filter = { _id: res.locals.id };
-      const book = await BookModel.findOneAndDelete(filter, {
-        projection: { __v: 0 },
-      });
-
-      if (book === null) {
-        return res.status(204).json();
-      }
-      res.json(book);
-    })
-  );
+  .get(wrap(getOneById))
+  .put(validation, wrap(completeUpdateOrCreateById))
+  .patch(validation, wrap(partialUpdateById))
+  .delete(wrap(deleteOneById));
 
 export default router;

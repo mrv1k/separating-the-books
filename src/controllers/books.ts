@@ -16,7 +16,7 @@ class BooksController {
     const rawBook = await BookModel.findOneAndUpdate(
       filter,
       {},
-      { returnOriginal: false, upsert: true, rawResult: true }
+      { upsert: true, new: true, rawResult: true, projection: { __v: 0 } }
     );
 
     if (rawBook.ok !== 1 || typeof rawBook.value === "undefined") {
@@ -25,7 +25,6 @@ class BooksController {
 
     const existed: boolean = rawBook.lastErrorObject.updatedExisting;
     const book = rawBook.value;
-    book.__v = undefined;
 
     const relativeUrl = `${req.originalUrl}/${book._id}`;
     const absoluteUrl = `${req.protocol}://${req.get("host")}${relativeUrl}`;

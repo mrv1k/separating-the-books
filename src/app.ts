@@ -46,7 +46,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   res.json({
     status: err.status || 500,
     message: err.message,
-    stack: err.stack.split("\n"),
+    stack: err.stack?.split("\n"),
   });
 };
 app.use(errorHandler);

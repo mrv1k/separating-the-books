@@ -1,4 +1,4 @@
-rest.http
+/*.http
 
 # MacOS
 .DS_Store

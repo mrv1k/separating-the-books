@@ -4,6 +4,9 @@ import AuthorsController from "../controllers/authors";
 
 const router = Router();
 
-router.route("/").get(wrap(AuthorsController.getAll));
+router
+  .route("/")
+  .get(wrap(AuthorsController.getAll))
+  .post(wrap(AuthorsController.createOne));
 
 export default router;

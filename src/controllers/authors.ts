@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import AuthorModel, { Author } from "../models/author";
+import { createLocationUrl } from "../utils/express-helpers";
 
 class AuthorsController {
   async getAll(req: Request, res: Response) {
@@ -24,14 +25,12 @@ class AuthorsController {
       .exec();
 
     if (existingAuthor) {
-      // ! copypaste from controllers/books
-      const relativeUrl = `${req.originalUrl}/${existingAuthor._id}`;
-      const absoluteUrl = `${req.protocol}://${req.get("host")}${relativeUrl}`;
-      res.location(absoluteUrl);
+      const location = createLocationUrl(req, existingAuthor._id);
+      res.location(location.absolute);
 
       return res.status(409).json({
         error: "Resource already exists",
-        location: relativeUrl,
+        location: location.relative,
       });
     }
 
@@ -39,12 +38,7 @@ class AuthorsController {
       validateBeforeSave: false, // validated above
     });
 
-    // ! copypaste number 3, refactor
-    const relativeUrl = `${req.originalUrl}/${author._id}`;
-    const absoluteUrl = `${req.protocol}://${req.get("host")}${relativeUrl}`;
-    res.location(absoluteUrl);
-
-    res.json(author);
+    res.location(createLocationUrl(req, author._id).absolute).json(author);
   }
 }
 

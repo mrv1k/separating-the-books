@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { wrap } from "utils/express-helpers";
+import { createLocationUrl } from "../utils/express-helpers";
 import BookModel from "../models/book";
 
 class BooksController {
@@ -26,14 +26,13 @@ class BooksController {
     const existed: boolean = rawBook.lastErrorObject.updatedExisting;
     const book = rawBook.value;
 
-    const relativeUrl = `${req.originalUrl}/${book._id}`;
-    const absoluteUrl = `${req.protocol}://${req.get("host")}${relativeUrl}`;
-    res.location(absoluteUrl);
+    const location = createLocationUrl(req, book._id);
+    res.location(location.absolute);
 
     if (existed) {
       return res.status(409).json({
         error: "Resource already exists",
-        location: relativeUrl,
+        location: location.relative,
       });
     }
 

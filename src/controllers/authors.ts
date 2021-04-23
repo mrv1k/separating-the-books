@@ -50,8 +50,42 @@ class AuthorsController implements REST {
     res.json(author);
   }
 
+  // 0. requires all fields to be present in response
+  // 1. search for it,
+  // 1.1 doesn't exist - create
+  // 1.2 exists - update
   async putOne(req: Request, res: Response, next: NextFunction) {
-    res.send("wip");
+    // ? Similar to POST logic
+    const { _id }: { _id: string } = res.locals;
+    const { first_name, last_name } = req.body;
+    const payload: Author = { first_name, last_name };
+
+    const author = await AuthorModel.findOne({
+      $or: [{ _id: _id }, payload],
+    });
+    console.log(author);
+
+    if (author === null) {
+      // create
+      console.log("fired");
+
+      res.end();
+      return;
+    }
+
+    if (author.id !== _id) {
+      console.log(typeof author._id, typeof _id);
+
+      console.log("found not by id", _id, author._id);
+    }
+    res.end();
+    return;
+
+    // author.first_name = payload.first_name;
+    // author.last_name = payload.last_name;
+    // await author.save();
+
+    // res.json(author);
   }
 
   async patchOne(req: Request, res: Response, next: NextFunction) {

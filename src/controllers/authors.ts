@@ -1,15 +1,16 @@
 import { NextFunction, Request, Response } from "express";
-import AuthorModel, { Author } from "../models/author";
-import { createLocationUrl } from "../utils/express-helpers";
+import AuthorModel, { Author } from "@/models/author";
+import { createLocationUrl } from "@/utils/express-helpers";
+import { REST } from "@/types/rest";
 
-class AuthorsController {
-  async getAll(req: Request, res: Response) {
+class AuthorsController implements REST {
+  async getMany(req: Request, res: Response) {
     const authors = await AuthorModel.find().lean();
 
     res.json(authors);
   }
 
-  async createOne(req: Request, res: Response, next: NextFunction) {
+  async postOne(req: Request, res: Response, next: NextFunction) {
     const { first_name, last_name } = req.body;
     const payload: Author = { first_name, last_name };
     // eslint-disable-next-line no-useless-catch
@@ -39,6 +40,22 @@ class AuthorsController {
     });
 
     res.location(createLocationUrl(req, author._id).absolute).json(author);
+  }
+
+  async getOne(req: Request, res: Response, next: NextFunction) {
+    res.send("wip");
+  }
+
+  async putOne(req: Request, res: Response, next: NextFunction) {
+    res.send("wip");
+  }
+
+  async patchOne(req: Request, res: Response, next: NextFunction) {
+    res.send("wip");
+  }
+
+  async deleteOne(req: Request, res: Response, next: NextFunction) {
+    res.send("wip");
   }
 }
 

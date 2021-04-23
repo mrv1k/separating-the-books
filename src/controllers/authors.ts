@@ -44,7 +44,10 @@ class AuthorsController implements REST {
   }
 
   async getOne(req: Request, res: Response, next: NextFunction) {
-    res.send("wip");
+    const author = await AuthorModel.findById(res.locals._id).lean().exec();
+
+    if (!author) return next();
+    res.json(author);
   }
 
   async putOne(req: Request, res: Response, next: NextFunction) {

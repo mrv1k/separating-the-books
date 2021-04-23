@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import AuthorModel, { Author } from "@/models/author";
-import { REST } from "@/types/rest";
+import { REST } from "@/types";
 import { createLocationUrl } from "@/utils/express-helpers";
 
 class AuthorsController implements REST {

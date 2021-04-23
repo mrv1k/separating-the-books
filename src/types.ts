@@ -1,6 +1,6 @@
-// https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design#define-operations-in-terms-of-http-methods
 import { NextFunction, Request, Response } from "express";
 
+// https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design#define-operations-in-terms-of-http-methods
 export interface REST {
   postOne(req: Request, res: Response, next?: NextFunction): Promise<unknown>;
   getOne(req: Request, res: Response, next?: NextFunction): Promise<unknown>;

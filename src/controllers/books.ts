@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import BookModel from "@/models/book";
-import { REST } from "@/types/rest";
+import { REST } from "@/types";
 import { createLocationUrl } from "@/utils/express-helpers";
 
 class BooksController implements REST {

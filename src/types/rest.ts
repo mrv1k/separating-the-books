@@ -8,5 +8,5 @@ export interface REST {
   patchOne(req: Request, res: Response, next?: NextFunction): Promise<unknown>;
   deleteOne(req: Request, res: Response, next?: NextFunction): Promise<unknown>;
 
-  getAll(req: Request, res: Response, next?: NextFunction): Promise<unknown>;
+  getMany(req: Request, res: Response, next?: NextFunction): Promise<unknown>;
 }

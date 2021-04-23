@@ -1,9 +1,10 @@
-import { NextFunction, Request, Response } from "express";
-import { createLocationUrl } from "../utils/express-helpers";
-import BookModel from "../models/book";
+import { Request, Response, NextFunction } from "express";
+import { createLocationUrl } from "@/utils/express-helpers";
+import BookModel from "@/models/book";
+import { REST } from "@/types/rest";
 
-class BooksController {
-  async getAll(req: Request, res: Response) {
+class BooksController implements REST {
+  async getMany(req: Request, res: Response) {
     const books = await BookModel.find({}, { __v: 0 })
       .lean()
       .populate("authors", { __v: 0 });
@@ -11,7 +12,7 @@ class BooksController {
     res.send(books);
   }
 
-  async createOne(req: Request, res: Response, next: NextFunction) {
+  async postOne(req: Request, res: Response, next: NextFunction) {
     const filter = { title: res.locals.title };
     const rawBook = await BookModel.findOneAndUpdate(
       filter,
@@ -39,7 +40,7 @@ class BooksController {
     return res.status(201).json(book);
   }
 
-  async getOneById(req: Request, res: Response, next: NextFunction) {
+  async getOne(req: Request, res: Response, next: NextFunction) {
     const book = await BookModel.findById(res.locals._id, { __v: 0 })
       .lean()
       .populate("authors", { __v: 0 });
@@ -48,11 +49,7 @@ class BooksController {
     res.json(book);
   }
 
-  async completeUpdateOrCreateOneById(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  async putOne(req: Request, res: Response, next: NextFunction) {
     const update = { title: res.locals.title };
     const rawBook = await BookModel.findByIdAndUpdate(res.locals._id, update, {
       upsert: true,
@@ -74,7 +71,7 @@ class BooksController {
     res.json(book);
   }
 
-  async partialUpdateOneById(req: Request, res: Response, next: NextFunction) {
+  async patchOne(req: Request, res: Response, next: NextFunction) {
     const { title, _id } = res.locals;
     const update = { title };
     const book = await BookModel.updateOne({ _id }, update);
@@ -85,7 +82,7 @@ class BooksController {
     res.json({ patched: update });
   }
 
-  async deleteOneById(req: Request, res: Response, next: NextFunction) {
+  async deleteOne(req: Request, res: Response, next: NextFunction) {
     const filter = { _id: res.locals._id };
     const book = await BookModel.findOneAndDelete(filter, {
       projection: { __v: 0 },

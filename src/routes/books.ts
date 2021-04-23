@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { RequestHandler } from "express";
 import { isValidObjectId } from "mongoose";
-import { wrap } from "../utils/express-helpers";
-import BooksController from "../controllers/books";
+import { wrap } from "@/utils/express-helpers";
+import BooksController from "@/controllers/books";
 
 const router = Router();
 
@@ -20,8 +20,8 @@ const validation: RequestHandler = (req, res, next) => {
 
 router
   .route("/")
-  .get(wrap(BooksController.getAll))
-  .post(validation, wrap(BooksController.createOne));
+  .get(wrap(BooksController.getMany))
+  .post(validation, wrap(BooksController.postOne));
 
 router.param("id", (req, res, next, id) => {
   if (!isValidObjectId(id)) next();
@@ -31,9 +31,9 @@ router.param("id", (req, res, next, id) => {
 
 router
   .route("/:id")
-  .get(wrap(BooksController.getOneById))
-  .put(validation, wrap(BooksController.completeUpdateOrCreateOneById))
-  .patch(validation, wrap(BooksController.partialUpdateOneById))
-  .delete(wrap(BooksController.deleteOneById));
+  .get(wrap(BooksController.getOne))
+  .put(validation, wrap(BooksController.putOne))
+  .patch(validation, wrap(BooksController.patchOne))
+  .delete(wrap(BooksController.deleteOne));
 
 export default router;

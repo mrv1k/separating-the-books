@@ -1,12 +1,13 @@
-import express, { ErrorRequestHandler } from "express";
 import cors from "cors";
-import winston from "winston";
-import createError from "http-errors";
-import expressWinston from "express-winston";
 import debug from "debug";
-import launchMongoDB from "./db";
-import booksRouter from "./routes/books";
-import authorsRouter from "./routes/authors";
+import express, { ErrorRequestHandler } from "express";
+import expressWinston from "express-winston";
+import createError from "http-errors";
+import winston from "winston";
+
+import launchMongoDB from "@/db";
+import authorsRouter from "@/routes/authors";
+import booksRouter from "@/routes/books";
 
 launchMongoDB();
 const app = express();

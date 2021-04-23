@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import { createLocationUrl } from "@/utils/express-helpers";
+import { NextFunction, Request, Response } from "express";
+
 import BookModel from "@/models/book";
 import { REST } from "@/types/rest";
+import { createLocationUrl } from "@/utils/express-helpers";
 
 class BooksController implements REST {
   async getMany(req: Request, res: Response) {

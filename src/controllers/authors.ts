@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
+
 import AuthorModel, { Author } from "@/models/author";
-import { createLocationUrl } from "@/utils/express-helpers";
 import { REST } from "@/types/rest";
+import { createLocationUrl } from "@/utils/express-helpers";
 
 class AuthorsController implements REST {
   async getMany(req: Request, res: Response) {

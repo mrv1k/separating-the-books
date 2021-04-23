@@ -1,12 +1,13 @@
 import { Router } from "express";
-import { wrap } from "../utils/express-helpers";
-import AuthorsController from "../controllers/authors";
+
+import AuthorsController from "@/controllers/authors";
+import { wrap } from "@/utils/express-helpers";
 
 const router = Router();
 
 router
   .route("/")
-  .get(wrap(AuthorsController.getAll))
-  .post(wrap(AuthorsController.createOne));
+  .get(wrap(AuthorsController.getMany))
+  .post(wrap(AuthorsController.postOne));
 
 export default router;

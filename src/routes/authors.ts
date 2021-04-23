@@ -13,6 +13,9 @@ router
 
 router.param("id", validateId);
 
-router.route("/:id").get(wrap(AuthorsController.getOne));
+router
+  .route("/:id")
+  .get(wrap(AuthorsController.getOne))
+  .delete(wrap(AuthorsController.deleteOne));
 
 export default router;

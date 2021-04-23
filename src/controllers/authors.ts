@@ -59,7 +59,13 @@ class AuthorsController implements REST {
   }
 
   async deleteOne(req: Request, res: Response, next: NextFunction) {
-    res.send("wip");
+    const author = await AuthorModel.findByIdAndDelete(res.locals._id);
+
+    if (author === null) {
+      return res.status(204).json();
+    }
+
+    res.json(author);
   }
 }
 

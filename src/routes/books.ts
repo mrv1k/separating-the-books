@@ -2,6 +2,7 @@ import { RequestHandler, Router } from "express";
 import { isValidObjectId } from "mongoose";
 
 import BooksController from "@/controllers/books";
+import { validateId } from "@/middlewares";
 import { wrap } from "@/utils/express-helpers";
 
 const router = Router();
@@ -23,11 +24,7 @@ router
   .get(wrap(BooksController.getMany))
   .post(validation, wrap(BooksController.postOne));
 
-router.param("id", (req, res, next, id) => {
-  if (!isValidObjectId(id)) next();
-  res.locals._id = id;
-  next();
-});
+router.param("id", validateId);
 
 router
   .route("/:id")

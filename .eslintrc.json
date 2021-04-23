@@ -16,12 +16,23 @@
   "parserOptions": {
     "ecmaVersion": 12
   },
-  "plugins": ["@typescript-eslint", "security", "jest"],
+  "plugins": [
+    "@typescript-eslint",
+    "security",
+    "simple-import-sort",
+    "import",
+    "jest"
+  ],
   "rules": {
     "node/no-unsupported-features/es-syntax": 0,
     "node/no-unpublished-import": 0,
     "node/no-missing-import": 0,
-    "@typescript-eslint/no-unused-vars": 0
+    "@typescript-eslint/no-unused-vars": 0,
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "import/first": "error",
+    "import/newline-after-import": "error",
+    "import/no-duplicates": "error"
     // "@typescript-eslint/no-unused-vars": [
     //   "error",
     //   { "argsIgnorePattern": "^_" }

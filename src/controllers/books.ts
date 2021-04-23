@@ -84,10 +84,7 @@ class BooksController implements REST {
   }
 
   async deleteOne(req: Request, res: Response, next: NextFunction) {
-    const filter = { _id: res.locals._id };
-    const book = await BookModel.findOneAndDelete(filter, {
-      projection: { __v: 0 },
-    });
+    const book = await BookModel.findByIdAndDelete(res.locals._id);
 
     if (book === null) {
       return res.status(204).json();

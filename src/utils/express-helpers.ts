@@ -13,7 +13,7 @@ export function createLocationUrl(
   req: Request,
   _id: Types.ObjectId
 ): LocationUrls {
-  const relative = `${req.originalUrl}/${_id}`;
+  const relative = `${req.baseUrl}/${_id}`;
   const absolute = `${req.protocol}://${req.get("host")}${relative}`;
   return { relative, absolute };
 }

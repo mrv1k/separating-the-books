@@ -1,8 +1,10 @@
-import { Request, RequestHandler } from "express";
+import { NextFunction, Request, Response } from "express";
 import { Types } from "mongoose";
 
-export function wrap(fn: RequestHandler): RequestHandler {
-  return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
+export function wrap(fn: any): any {
+  return (req: Request, res: Response, next: NextFunction) =>
+    Promise.resolve(fn(req, res, next)).catch(next);
 }
 
 interface LocationUrls {

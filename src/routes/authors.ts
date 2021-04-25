@@ -16,7 +16,8 @@ router.param("id", validateId);
 router
   .route("/:id")
   .get(wrap(AuthorsController.getOne))
-  .put(wrap(AuthorsController.putOne))
+  // ! FIXME: wrap helpers breaks, disable for now
+  .put(AuthorsController.putOne)
   .delete(wrap(AuthorsController.deleteOne));
 
 export default router;

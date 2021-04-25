@@ -54,38 +54,42 @@ class AuthorsController implements REST {
   // 1. search for it,
   // 1.1 doesn't exist - create
   // 1.2 exists - update
-  async putOne(req: Request, res: Response, next: NextFunction) {
+  async putOne(
+    req: Request,
+    res: Response<unknown, Record<string, unknown> & { _id: string }>,
+    next: NextFunction
+  ) {
     // ? Similar to POST logic
-    const { _id }: { _id: string } = res.locals;
-    const { first_name, last_name } = req.body;
-    const payload: Author = { first_name, last_name };
+    const { _id } = res.locals;
+    const payload: Author = {
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+    };
+    console.log(payload);
 
-    const author = await AuthorModel.findOne({
+    const existingAuthor = await AuthorModel.findOne({
       $or: [{ _id: _id }, payload],
     });
-    console.log(author);
 
-    if (author === null) {
-      // create
-      console.log("fired");
-
-      res.end();
-      return;
+    if (existingAuthor === null) {
+      const author = await AuthorModel.create(payload);
+      return res.status(201).json(author);
     }
 
-    if (author.id !== _id) {
-      console.log(typeof author._id, typeof _id);
+    // found by id
+    if (existingAuthor.id === _id) {
+      existingAuthor.first_name = payload.first_name;
+      existingAuthor.last_name = payload.last_name;
+      await existingAuthor.save();
 
-      console.log("found not by id", _id, author._id);
+      return res.json(existingAuthor);
     }
-    res.end();
-    return;
 
-    // author.first_name = payload.first_name;
-    // author.last_name = payload.last_name;
-    // await author.save();
+    // found not by id, redirect
+    const { absolute } = createLocationUrl(req, existingAuthor.id);
+    console.log("found by id, redirect");
 
-    // res.json(author);
+    return res.location(absolute).status(303).end();
   }
 
   async patchOne(req: Request, res: Response, next: NextFunction) {

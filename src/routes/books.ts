@@ -1,5 +1,4 @@
 import { RequestHandler, Router } from "express";
-import { isValidObjectId } from "mongoose";
 
 import BooksController from "@/controllers/books";
 import { validateId } from "@/middlewares";

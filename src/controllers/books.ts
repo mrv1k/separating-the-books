@@ -67,9 +67,11 @@ class BooksController implements REST {
     book.__v = undefined;
     console.log(book.authors);
 
-    if (!existed) res.status(201);
+    if (existed) {
+      res.json(book);
+    }
 
-    res.json(book);
+    res.status(201).json(book);
   }
 
   async patchOne(req: Request, res: Response, next: NextFunction) {

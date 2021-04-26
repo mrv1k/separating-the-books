@@ -13,6 +13,15 @@ class BooksController implements REST {
     res.send(books);
   }
 
+  async getOne(req: Request, res: Response, next: NextFunction) {
+    const book = await BookModel.findById(res.locals._id, { __v: 0 })
+      .lean()
+      .populate("authors", { __v: 0 });
+
+    if (book === null) return next();
+    res.json(book);
+  }
+
   async postOne(req: Request, res: Response, next: NextFunction) {
     const filter = { title: res.locals.title };
     const rawBook = await BookModel.findOneAndUpdate(
@@ -39,15 +48,6 @@ class BooksController implements REST {
     }
 
     return res.status(201).json(book);
-  }
-
-  async getOne(req: Request, res: Response, next: NextFunction) {
-    const book = await BookModel.findById(res.locals._id, { __v: 0 })
-      .lean()
-      .populate("authors", { __v: 0 });
-
-    if (book === null) return next();
-    res.json(book);
   }
 
   async putOne(req: Request, res: Response, next: NextFunction) {

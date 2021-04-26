@@ -11,6 +11,13 @@ class AuthorsController implements REST {
     res.json(authors);
   }
 
+  async getOne(req: Request, res: Response, next: NextFunction) {
+    const author = await AuthorModel.findById(res.locals._id).lean().exec();
+
+    if (!author) return next();
+    res.json(author);
+  }
+
   async postOne(req: Request, res: Response, next: NextFunction) {
     const { first_name, last_name } = req.body;
     const payload: Author = { first_name, last_name };
@@ -43,24 +50,8 @@ class AuthorsController implements REST {
     res.location(createLocationUrl(req, author._id).absolute).json(author);
   }
 
-  async getOne(req: Request, res: Response, next: NextFunction) {
-    const author = await AuthorModel.findById(res.locals._id).lean().exec();
-
-    if (!author) return next();
-    res.json(author);
-  }
-
-  // 0. requires all fields to be present in response
-  // 1. search for it,
-  // 1.1 doesn't exist - create
-  // 1.2 exists - update
-  async putOne(
-    req: Request,
-    res: Response<unknown, Record<string, unknown> & { _id: string }>,
-    next: NextFunction
-  ) {
-    // ? Similar to POST logic
-    const { _id } = res.locals;
+  async putOne(req: Request, res: Response, next: NextFunction) {
+    const _id = res.locals._id;
     const payload: Author = {
       first_name: req.body.first_name,
       last_name: req.body.last_name,

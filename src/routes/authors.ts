@@ -17,7 +17,7 @@ router
   .route("/:id")
   .get(wrap(AuthorsController.getOne))
   .put(wrap(AuthorsController.putOne))
-  // .put(AuthorsController.putOne)
+  .patch(wrap(AuthorsController.patchOne))
   .delete(wrap(AuthorsController.deleteOne));
 
 export default router;

@@ -67,33 +67,41 @@ class AuthorsController implements REST {
     };
     console.log(payload);
 
-    const existingAuthor = await AuthorModel.findOne({
+    const author = await AuthorModel.findOne({
       $or: [{ _id: _id }, payload],
     });
 
-    if (existingAuthor === null) {
-      const author = await AuthorModel.create(payload);
-      return res.status(201).json(author);
+    if (author === null) {
+      const newAuthor = await AuthorModel.create(payload);
+      return res.status(201).json(newAuthor);
     }
 
     // found by id
-    if (existingAuthor.id === _id) {
-      existingAuthor.first_name = payload.first_name;
-      existingAuthor.last_name = payload.last_name;
-      await existingAuthor.save();
+    if (author.id === _id) {
+      author.first_name = payload.first_name;
+      author.last_name = payload.last_name;
+      await author.save();
 
-      return res.json(existingAuthor);
+      return res.json(author);
     }
 
     // found not by id, redirect
-    const { absolute } = createLocationUrl(req, existingAuthor.id);
+    const { absolute } = createLocationUrl(req, author.id);
     console.log("found by id, redirect");
 
     return res.location(absolute).status(303).end();
   }
 
   async patchOne(req: Request, res: Response, next: NextFunction) {
-    res.send("wip");
+    const author = await AuthorModel.findById(res.locals._id);
+    if (author === null) return res.status(404).end();
+
+    const { first_name, last_name } = req.body;
+    if (first_name) author.first_name = first_name;
+    if (last_name) author.last_name = last_name;
+    author.save();
+
+    res.json(author);
   }
 
   async deleteOne(req: Request, res: Response, next: NextFunction) {

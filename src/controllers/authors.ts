@@ -88,6 +88,11 @@ class AuthorsController implements REST {
     if (author === null) return res.status(404).end();
 
     const { first_name, last_name } = req.body;
+    if (first_name === author.first_name && last_name === author.last_name) {
+      // already up to date
+      return res.json(author);
+    }
+
     if (first_name) author.first_name = first_name;
     if (last_name) author.last_name = last_name;
     author.save();

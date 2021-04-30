@@ -1,7 +1,6 @@
 import supertest from "supertest";
 
 import { app } from "../app";
-import { inMemoryDB } from "../in-memory-db";
 
 /** @name supertest https://github.com/visionmedia/supertest#api
  * @function .expect(status[,fn]) - Assert response status code.
@@ -18,6 +17,16 @@ describe("/api/books", () => {
   });
 
   describe("/", () => {
+    test("it works", () => {
+      expect(true).toBe(true);
+    });
+
+    // test("gets", async () => {
+    //   const res = await request.get("/");
+
+    //   expect(res.text).toBe("yes");
+    // });
+
     test.todo("rewrite to work with mongo");
     //   test("GET returns all books", async () => {
     //     const booksRes = await request

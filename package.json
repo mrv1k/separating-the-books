@@ -18,7 +18,6 @@
   },
   "devDependencies": {
     "@jest/types": "^26.6.2",
-    "@shelf/jest-mongodb": "^1.2.4",
     "@types/body-parser": "^1.19.0",
     "@types/cors": "^2.8.10",
     "@types/debug": "^4.1.5",

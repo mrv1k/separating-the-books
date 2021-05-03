@@ -3,12 +3,15 @@ import mongoose, { Document, Model, Schema, Types } from "mongoose";
 
 import { AuthorDocument } from "./author";
 
-const BookSchema = new mongoose.Schema<BookDocument, BookModel>({
-  title: { type: String, required: true, maxLength: 100 },
-  subtitle: { type: String, maxLength: 100 },
-  pageCount: { type: Number, required: true, min: 0, max: 32666 },
-  authors: [{ type: Schema.Types.ObjectId, ref: "Author", required: true }],
-});
+const BookSchema = new mongoose.Schema<BookDocument, BookModel>(
+  {
+    title: { type: String, required: true, maxLength: 100 },
+    subtitle: { type: String, maxLength: 100 },
+    pageCount: { type: Number, required: true, min: 0, max: 32666 },
+    authors: [{ type: Schema.Types.ObjectId, ref: "Author", required: true }],
+  },
+  { autoCreate: true }
+);
 
 // ES Types, except for ID
 export interface Book {

@@ -1,9 +1,12 @@
 import mongoose, { Document, Model, Types } from "mongoose";
 
-const AuthorSchema = new mongoose.Schema<AuthorDocument, AuthorModel>({
-  first_name: { type: String, required: true, minLength: 2, maxLength: 100 },
-  last_name: { type: String, required: true, minLength: 2, maxLength: 100 },
-});
+const AuthorSchema = new mongoose.Schema<AuthorDocument, AuthorModel>(
+  {
+    first_name: { type: String, required: true, minLength: 2, maxLength: 100 },
+    last_name: { type: String, required: true, minLength: 2, maxLength: 100 },
+  },
+  { autoCreate: true }
+);
 
 export interface Author {
   first_name: string;

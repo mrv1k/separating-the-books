@@ -1,6 +1,8 @@
 import supertest from "supertest";
 
 import { app } from "../app";
+import TestDB from "../loaders/test-mongoose";
+import BookModel, { Book } from "../models/book";
 
 /** @name supertest https://github.com/visionmedia/supertest#api
  * @function .expect(status[,fn]) - Assert response status code.
@@ -9,42 +11,41 @@ import { app } from "../app";
  * @function .expect(field,value[,fn]) - Assert header field value with a string or regular expression.
  * @function .expect(function(res)) - Pass a custom assertion function. It'll be given the response object to check. If the check fails, throw an error
  */
-//  { title: "The Well of Eternity", id: "0" },
-//  { title: "The Demon Soul", id: "1" },
-//  { title: "The Sundering", id: "2" },
 
 describe("/api/books", () => {
   let request: supertest.SuperTest<supertest.Test>;
-  beforeAll(() => {
+  let db: TestDB;
+
+  beforeAll(async () => {
+    db = new TestDB();
+    await db.start();
     request = supertest(app);
   });
 
+  afterAll(async () => {
+    await db.stop();
+  });
+
   describe("/", () => {
-    test("it works", () => {
-      expect(true).toBe(true);
+    test("GET returns all books", async () => {
+      return request
+        .get("/api/books")
+        .expect("Content-Type", /json/)
+        .expect(200, []);
     });
 
-    // test("gets", async () => {
-    //   const res = await request.get("/");
+    test("POST create a new book", async () => {
+      const payload: Book = { title: "Title", pageCount: 100, authors: [] };
+      await request.post("/api/books").send(payload).expect(201);
 
-    //   expect(res.text).toBe("yes");
-    // });
+      const count = await BookModel.estimatedDocumentCount();
+      expect(count).toEqual(1);
 
-    test.todo("rewrite to work with mongo");
-    //   test("GET returns all books", async () => {
-    //     const booksRes = await request
-    //       .get("/api/books")
-    //       .expect("Content-Type", /json/)
-    //       .expect(200, inMemoryDB);
+      const book = await BookModel.findOne({ title: payload.title }).lean();
+      expect(book).not.toBeNull();
 
-    //     expect(booksRes.body).toMatchObject(inMemoryDB);
-    //   });
-
-    //   test("POST create a new book", async () => {
-    //     const newBook = { title: "Wawawewa" };
-    //     await request.post("/api/books").send(newBook).expect(201);
-    //     expect(inMemoryDB).toContainEqual(expect.objectContaining(newBook));
-    //   });
+      // expect(book).toMatchObject(payload);
+    });
   });
 
   describe("/:id", () => {

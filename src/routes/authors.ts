@@ -1,15 +1,15 @@
 import { Router } from "express";
 
 import AuthorsController from "@/controllers/authors";
-import { validateId } from "@/middlewares";
-import { methodNotAllowed, wrap } from "@/utils/express-helpers";
+import { methodNotAllowed, validateId } from "@/middlewares";
+import { wrap } from "@/utils/express-helpers";
 
 const router = Router();
 
 router
   .route("/")
-  .get(wrap(AuthorsController.getMany))
   .post(wrap(AuthorsController.postOne))
+  .get(wrap(AuthorsController.getMany))
   .put(methodNotAllowed)
   .patch(methodNotAllowed)
   .delete(methodNotAllowed);
@@ -18,8 +18,8 @@ router.param("id", validateId);
 
 router
   .route("/:id")
-  .get(wrap(AuthorsController.getOne))
   .post(methodNotAllowed)
+  .get(wrap(AuthorsController.getOne))
   .put(wrap(AuthorsController.putOne))
   .patch(wrap(AuthorsController.patchOne))
   .delete(wrap(AuthorsController.deleteOne));

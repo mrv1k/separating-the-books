@@ -7,26 +7,23 @@ import { createLocationUrl } from "@/utils/express-helpers";
 class AuthorsController implements REST {
   async getMany(req: Request, res: Response) {
     const authors = await AuthorModel.find().lean();
-
     res.json(authors);
   }
 
   async getOne(req: Request, res: Response, next: NextFunction) {
     const author = await AuthorModel.findById(res.locals._id).lean().exec();
 
-    if (!author) return next();
+    if (author === null) return next();
     res.json(author);
   }
 
   async postOne(req: Request, res: Response, next: NextFunction) {
-    const { first_name, last_name } = req.body;
-    const payload: Author = { first_name, last_name };
-    // eslint-disable-next-line no-useless-catch
-    try {
-      await AuthorModel.validate(payload);
-    } catch (error) {
-      throw error;
-    }
+    const payload: Author = {
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+    };
+
+    await AuthorModel.validate(payload);
 
     // can't use .exists() - need object id for url, use equivalent
     const existingAuthor = await AuthorModel.findOne(payload, { _id: 1 })

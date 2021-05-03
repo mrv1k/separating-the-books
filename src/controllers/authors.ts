@@ -32,9 +32,7 @@ class AuthorsController implements REST {
 
     if (existingAuthor) {
       const location = createLocationUrl(req, existingAuthor._id);
-      res.location(location.absolute);
-
-      return res.status(409).json({
+      return res.location(location.absolute).status(409).json({
         error: "Resource already exists",
         location: location.relative,
       });

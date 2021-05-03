@@ -48,7 +48,6 @@ describe("/api/books", () => {
 
       await BookModel.create(payload);
       const t = await request.post("/api/books").send(payload).expect(409);
-      console.log(t.body);
     });
 
     test.skip("POST create a new book with a new author", async () => {

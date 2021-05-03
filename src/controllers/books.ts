@@ -40,6 +40,7 @@ class BooksController implements REST {
       pageCount: req.body.pageCount,
       authors: [],
     };
+    // Type 'ObjectId[] | Author[] | Record<string, unknown>' is not assignable to type 'Condition<ObjectId[]> | undefined'.
 
     try {
       await BookModel.validate(payload);

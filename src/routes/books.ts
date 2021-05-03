@@ -2,7 +2,7 @@ import { RequestHandler, Router } from "express";
 
 import BooksController from "@/controllers/books";
 import { validateId } from "@/middlewares";
-import { wrap } from "@/utils/express-helpers";
+import { methodNotAllowed, wrap } from "@/utils/express-helpers";
 
 const router = Router();
 
@@ -21,13 +21,17 @@ const validation: RequestHandler = (req, res, next) => {
 router
   .route("/")
   .get(wrap(BooksController.getMany))
-  .post(validation, wrap(BooksController.postOne));
+  .post(validation, wrap(BooksController.postOne))
+  .put(methodNotAllowed)
+  .patch(methodNotAllowed)
+  .delete(methodNotAllowed);
 
 router.param("id", validateId);
 
 router
   .route("/:id")
   .get(wrap(BooksController.getOne))
+  .post(methodNotAllowed)
   .put(validation, wrap(BooksController.putOne))
   .patch(validation, wrap(BooksController.patchOne))
   .delete(wrap(BooksController.deleteOne));

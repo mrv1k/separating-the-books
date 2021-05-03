@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import cors from "cors";
 import debug from "debug";
 import express, { ErrorRequestHandler } from "express";
@@ -10,6 +12,7 @@ import authorsRouter from "@/routes/authors";
 import booksRouter from "@/routes/books";
 
 launchMongoDB();
+
 const app = express();
 
 const debugLog = debug("app");

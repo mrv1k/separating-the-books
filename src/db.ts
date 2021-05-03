@@ -1,18 +1,18 @@
-import "@/models/author";
-import "@/models/book";
-
 import mongoose from "mongoose";
 
+// import AuthorModel from "@/models/author";
+// import BookModel from "@/models/book";
+
 export default async function launchMongoDB(): Promise<mongoose.Connection> {
-  const mongoDB = "mongodb://localhost:27017/separating_the_books";
-  await mongoose.connect(mongoDB, {
+  const dbUri = `${process.env.MONGO_URI}${process.env.MONGO_DB_NAME}`;
+  await mongoose.connect(dbUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
   });
 
   mongoose.connection.once("open", function () {
-    console.log("test test, do you copy? open", mongoDB);
+    console.log("test test, do you copy? open", dbUri);
   });
 
   mongoose.connection.on(
@@ -20,12 +20,12 @@ export default async function launchMongoDB(): Promise<mongoose.Connection> {
     console.error.bind(console, "MongoDB connection error:")
   );
 
-  // const author = await Author.create({
+  // const author = await AuthorModel.create({
   //   first_name: "Richard",
   //   last_name: "Knaak",
   // });
 
-  // await Book.create({
+  // await BookModel.create({
   //   title: "The Well of Eternity",
   //   pageCount: 370,
   //   authors: [author._id],

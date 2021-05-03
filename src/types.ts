@@ -9,3 +9,15 @@ export interface REST {
   patchOne(req: Request, res: Response, next?: NextFunction): Promise<unknown>;
   deleteOne(req: Request, res: Response, next?: NextFunction): Promise<unknown>;
 }
+
+/* eslint-disable @typescript-eslint/no-namespace */
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      NODE_ENV?: "development" | "production" | "test";
+      PORT?: string;
+      MONGO_URI: string;
+      MONGO_DB: string;
+    }
+  }
+}

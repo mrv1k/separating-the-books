@@ -1,7 +1,7 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose, { Connection, Mongoose } from "mongoose";
 
-import { options } from "@/db";
+import { options } from "@/loaders/mongoose";
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
 

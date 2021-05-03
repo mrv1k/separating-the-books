@@ -7,7 +7,7 @@ import expressWinston from "express-winston";
 import createError from "http-errors";
 import winston from "winston";
 
-import launchMongoDB from "@/db";
+import launchMongoDB from "@/loaders/mongoose";
 import authorsRouter from "@/routes/authors";
 import booksRouter from "@/routes/books";
 

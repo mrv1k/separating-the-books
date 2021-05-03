@@ -28,14 +28,39 @@ describe("/api/books", () => {
 
   describe("/", () => {
     test("GET returns all books", async () => {
+      // TODO: refactor to return books
       return request
         .get("/api/books")
         .expect("Content-Type", /json/)
         .expect(200, []);
     });
 
-    test("POST create a new book", async () => {
-      const payload: Book = { title: "Title", pageCount: 100, authors: [] };
+    test("POST responds with 409 when book already exists", async () => {
+      // const authors = {
+      //   first_name: "first_name",
+      //   last_name: "last_name",
+      // };
+      const payload: Book = {
+        title: "title",
+        pageCount: 100,
+        authors: [],
+      };
+
+      await BookModel.create(payload);
+      const t = await request.post("/api/books").send(payload).expect(409);
+      console.log(t.body);
+    });
+
+    test.skip("POST create a new book with a new author", async () => {
+      // const authors = {
+      //   first_name: "first_name",
+      //   last_name: "last_name",
+      // };
+      const payload: Book = {
+        title: "title",
+        pageCount: 100,
+        authors: [],
+      };
       await request.post("/api/books").send(payload).expect(201);
 
       const count = await BookModel.estimatedDocumentCount();
@@ -44,7 +69,7 @@ describe("/api/books", () => {
       const book = await BookModel.findOne({ title: payload.title }).lean();
       expect(book).not.toBeNull();
 
-      // expect(book).toMatchObject(payload);
+      expect(book).toMatchObject(payload);
     });
   });
 

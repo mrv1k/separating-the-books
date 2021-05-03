@@ -3,7 +3,7 @@ import mongoose, { Connection, Mongoose } from "mongoose";
 
 import { options } from "@/loaders/mongoose";
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
+// jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
 
 export default class TestDB {
   server = new MongoMemoryServer();

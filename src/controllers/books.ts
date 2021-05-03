@@ -1,53 +1,74 @@
 import { NextFunction, Request, Response } from "express";
+import createError from "http-errors";
 
-import BookModel from "@/models/book";
+import AuthorModel, { Author } from "@/models/author";
+import BookModel, { Book } from "@/models/book";
 import { REST } from "@/types";
 import { createLocationUrl } from "@/utils/express-helpers";
 
 class BooksController implements REST {
   async getMany(req: Request, res: Response) {
-    const books = await BookModel.find({}, { __v: 0 })
-      .lean()
-      .populate("authors", { __v: 0 });
-
+    const books = await BookModel.find().lean().populate("authors");
     res.send(books);
   }
 
   async getOne(req: Request, res: Response, next: NextFunction) {
-    const book = await BookModel.findById(res.locals._id, { __v: 0 })
+    const book = await BookModel.findById(res.locals._id)
       .lean()
-      .populate("authors", { __v: 0 });
+      .populate("authors")
+      .exec();
 
     if (book === null) return next();
     res.json(book);
   }
 
   async postOne(req: Request, res: Response, next: NextFunction) {
-    const filter = { title: res.locals.title };
-    const rawBook = await BookModel.findOneAndUpdate(
-      filter,
-      {},
-      { upsert: true, new: true, rawResult: true, projection: { __v: 0 } }
-    );
+    // TODO: handle array of authors IDs
+    // if (Array.isArray(req.body.authors) === false) {
+    //   return res.status().json();
+    // }
 
-    if (rawBook.ok !== 1 || typeof rawBook.value === "undefined") {
-      return next();
+    // const author: Author = {
+    //   first_name: req.body.first_name,
+    //   last_name: req.body.last_name,
+    // };
+
+    // AuthorModel.validate(author);
+
+    const payload: Book = {
+      title: req.body.title,
+      pageCount: req.body.pageCount,
+      authors: [],
+    };
+
+    try {
+      await BookModel.validate(payload);
+    } catch (validation) {
+      return res.status(422).json({
+        error: new createError.UnprocessableEntity(),
+        validation,
+      });
     }
 
-    const existed: boolean = rawBook.lastErrorObject.updatedExisting;
-    const book = rawBook.value;
-
-    const location = createLocationUrl(req, book._id);
-    res.location(location.absolute);
-
-    if (existed) {
-      return res.status(409).json({
-        error: "Resource already exists",
+    const existingBook = await BookModel.findOne(payload);
+    if (existingBook) {
+      const location = createLocationUrl(req, existingBook._id);
+      return res.location(location.absolute).status(409).json({
+        error: new createError.Conflict(),
         location: location.relative,
       });
     }
 
-    return res.status(201).json(book);
+    // res.location(location.absolute);
+
+    // if (existed) {
+    //   return res.status(409).json({
+    //     error: "Resource already exists",
+    //     location: location.relative,
+    //   });
+    // }
+
+    // return res.status(201).json(book);
   }
 
   async putOne(req: Request, res: Response, next: NextFunction) {

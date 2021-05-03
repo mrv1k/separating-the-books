@@ -1,7 +1,7 @@
 // based on: https://medium.com/@agentwhs/complete-guide-for-typescript-for-mongoose-for-node-js-8cc0a7e470c1
 import mongoose, { Document, Model, Schema, Types } from "mongoose";
 
-import { AuthorDocument } from "./author";
+import { Author, AuthorDocument } from "./author";
 
 const BookSchema = new mongoose.Schema<BookDocument, BookModel>(
   {
@@ -18,7 +18,7 @@ export interface Book {
   title: string;
   subtitle?: string;
   pageCount: number;
-  authors: Types.ObjectId[] | AuthorDocument[] | Record<string, unknown>;
+  authors: Types.ObjectId[] | Author[] | Record<string, unknown>;
 }
 
 // Mongoose Types, not exported because author field is non deterministic

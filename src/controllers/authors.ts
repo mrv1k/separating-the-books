@@ -14,7 +14,7 @@ class AuthorsController implements REST {
     const author = await AuthorModel.findById(res.locals._id).lean().exec();
 
     if (author === null) return next();
-    res.json(author);
+    return res.json(author);
   }
 
   async postOne(req: Request, res: Response, next: NextFunction) {

@@ -1,8 +1,8 @@
 import supertest from "supertest";
 
-import { app } from "../app";
-import TestDB from "../loaders/test-mongoose";
-import BookModel, { Book } from "../models/book";
+import { app } from "../../app";
+import TestDB from "../../loaders/test-mongoose";
+import BookModel, { Book } from "../../models/book";
 
 /** @name supertest https://github.com/visionmedia/supertest#api
  * @function .expect(status[,fn]) - Assert response status code.

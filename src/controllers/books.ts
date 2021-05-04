@@ -34,13 +34,13 @@ class BooksController implements REST {
     // };
 
     // AuthorModel.validate(author);
+    const authors: Author[] = [];
 
     const payload: Book = {
       title: req.body.title,
       pageCount: req.body.pageCount,
-      authors: [],
+      authors,
     };
-    // Type 'ObjectId[] | Author[] | Record<string, unknown>' is not assignable to type 'Condition<ObjectId[]> | undefined'.
 
     try {
       await BookModel.validate(payload);

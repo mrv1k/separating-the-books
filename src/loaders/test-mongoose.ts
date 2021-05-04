@@ -1,7 +1,7 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose, { Connection, Mongoose } from "mongoose";
 
-import { options } from "@/loaders/mongoose";
+import { options } from "./mongoose";
 
 // jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
 
@@ -11,8 +11,8 @@ export default class TestDB {
   connection?: Connection;
 
   async start(): Promise<void> {
-    const dbUri = await this.server.getUri();
-    this.client = await mongoose.connect(dbUri, options);
+    const uri = await this.server.getUri();
+    this.client = await mongoose.connect(uri, options);
     this.connection = this.client.connection;
   }
 

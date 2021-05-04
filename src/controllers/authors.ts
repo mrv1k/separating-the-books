@@ -7,7 +7,7 @@ import { createLocationUrl } from "@/utils/express-helpers";
 class AuthorsController implements REST {
   async getMany(req: Request, res: Response) {
     const authors = await AuthorModel.find().lean();
-    res.json(authors);
+    return res.json(authors);
   }
 
   async getOne(req: Request, res: Response, next: NextFunction) {

@@ -16,10 +16,10 @@ describe("controllers/authors", () => {
     await db.start();
   });
   beforeEach(async () => {
+    await db.cleanup();
     req = {} as Request;
     res = { json: (body) => body } as Response;
   });
-  afterEach(async () => await db.cleanup());
   afterAll(async () => await db.stop());
 
   it("gets many authors", async () => {

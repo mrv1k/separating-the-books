@@ -21,7 +21,9 @@ describe("/api/books", () => {
     await db.start();
     request = supertest(app);
   });
-
+  beforeEach(async () => {
+    await db.cleanup();
+  });
   afterAll(async () => {
     await db.stop();
   });
@@ -47,7 +49,10 @@ describe("/api/books", () => {
       };
 
       await BookModel.create(payload);
-      const t = await request.post("/api/books").send(payload).expect(409);
+      const response = await request
+        .post("/api/books")
+        .send(payload)
+        .expect(409);
     });
 
     test.skip("POST create a new book with a new author", async () => {

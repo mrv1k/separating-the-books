@@ -1,6 +1,9 @@
 /*.http
 /globalConfig.json
 
+# Docker
+docker.env
+
 # MacOS
 .DS_Store
 

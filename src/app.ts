@@ -3,7 +3,7 @@ import "dotenv/config";
 import express from "express";
 
 import expressLoader from "@/loaders/express";
-import db from "@/loaders/mongoose";
+import db from "@/loaders/typeorm";
 
 const app = express();
 expressLoader(app);

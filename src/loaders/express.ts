@@ -5,7 +5,7 @@ import expressWinston from "express-winston";
 import createError from "http-errors";
 import winston from "winston";
 
-import authorsRouter from "@/routes/authors";
+// import authorsRouter from "@/routes/authors";
 import booksRouter from "@/routes/books";
 
 export default (app: Application): Application => {
@@ -13,7 +13,7 @@ export default (app: Application): Application => {
   app.use(cors());
 
   app.use("/api/books", booksRouter);
-  app.use("/api/authors", authorsRouter);
+  // app.use("/api/authors", authorsRouter);
 
   app.use((req, res, next) => {
     next(createError(404, "No, can do"));

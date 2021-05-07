@@ -1,4 +1,5 @@
 import "dotenv/config";
+import "reflect-metadata";
 
 import express from "express";
 
@@ -11,7 +12,7 @@ expressLoader(app);
 const startServer = async () => {
   // fix for: "Jest has detected the following 1 open handle potentially keeping Jest from exiting"
   if (process.env.NODE_ENV === "test") return;
-  db.start();
+  await db.start();
 
   const PORT = process.env.PORT || 3000;
   const server = app.listen(PORT, () => {

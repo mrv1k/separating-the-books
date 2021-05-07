@@ -1,4 +1,4 @@
-import { ConnectionOptions, createConnection } from "typeorm";
+import { Connection, ConnectionOptions, createConnection } from "typeorm";
 
 const config: ConnectionOptions = {
   type: "postgres",
@@ -12,9 +12,9 @@ const config: ConnectionOptions = {
 };
 
 class DB {
-  async start() {
+  async start(): Promise<Connection> {
     try {
-      await createConnection(config);
+      return await createConnection(config);
     } catch (error) {
       console.error("Failed to connect the database", error);
       return error;

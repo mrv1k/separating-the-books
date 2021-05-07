@@ -3,12 +3,10 @@ import createError from "http-errors";
 import { getRepository } from "typeorm";
 
 import Book from "@/entity/book";
-// import { REST } from "@/types";
+import { REST } from "@/types";
 import { createLocationUrl } from "@/utils/express-helpers";
 
 class BooksController {
-  // private repository = getRepository(Book);
-
   async getMany(req: Request, res: Response) {
     const repository = getRepository(Book);
     const books = await repository.find();

@@ -1,109 +1,112 @@
 import { NextFunction, Request, Response } from "express";
+import { getRepository } from "typeorm";
 
-import AuthorModel, { Author } from "@/models/author";
-import { REST } from "@/types";
+import { Author } from "@/entity/author";
+// import { REST } from "@/types";
 import { createLocationUrl } from "@/utils/express-helpers";
 
-class AuthorsController implements REST {
+class AuthorsController {
   async getMany(req: Request, res: Response) {
-    const authors = await AuthorModel.find().lean();
+    const repository = getRepository(Author);
+    const authors = await repository.find();
     return res.json(authors);
   }
 
   async getOne(req: Request, res: Response, next: NextFunction) {
-    const author = await AuthorModel.findById(res.locals._id).lean().exec();
+    const repository = getRepository(Author);
+    const author = await repository.findOne(req.params.id);
 
-    if (author === null) return next();
+    if (author === undefined) return next();
     return res.json(author);
   }
 
-  async postOne(req: Request, res: Response, next: NextFunction) {
-    const payload: Author = {
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-    };
+  // async postOne(req: Request, res: Response, next: NextFunction) {
+  //   const payload: Author = {
+  //     first_name: req.body.first_name,
+  //     last_name: req.body.last_name,
+  //   };
 
-    await AuthorModel.validate(payload);
+  //   await AuthorModel.validate(payload);
 
-    // can't use .exists() - need object id for url, use equivalent
-    const existingAuthor = await AuthorModel.findOne(payload, { _id: 1 })
-      .lean()
-      .exec();
+  //   // can't use .exists() - need object id for url, use equivalent
+  //   const existingAuthor = await AuthorModel.findOne(payload, { _id: 1 })
+  //     .lean()
+  //     .exec();
 
-    if (existingAuthor) {
-      const location = createLocationUrl(req, existingAuthor._id);
-      return res.location(location.absolute).status(409).json({
-        error: "Resource already exists",
-        location: location.relative,
-      });
-    }
+  //   if (existingAuthor) {
+  //     const location = createLocationUrl(req, existingAuthor._id);
+  //     return res.location(location.absolute).status(409).json({
+  //       error: "Resource already exists",
+  //       location: location.relative,
+  //     });
+  //   }
 
-    const author = await new AuthorModel(payload).save({
-      validateBeforeSave: false, // validated above
-    });
+  //   const author = await new AuthorModel(payload).save({
+  //     validateBeforeSave: false, // validated above
+  //   });
 
-    res.location(createLocationUrl(req, author._id).absolute).json(author);
-  }
+  //   res.location(createLocationUrl(req, author._id).absolute).json(author);
+  // }
 
-  async putOne(req: Request, res: Response, next: NextFunction) {
-    const _id = res.locals._id;
-    const payload: Author = {
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-    };
-    console.log(payload);
+  // async putOne(req: Request, res: Response, next: NextFunction) {
+  //   const _id = res.locals._id;
+  //   const payload: Author = {
+  //     first_name: req.body.first_name,
+  //     last_name: req.body.last_name,
+  //   };
+  //   console.log(payload);
 
-    const author = await AuthorModel.findOne({
-      $or: [{ _id: _id }, payload],
-    });
+  //   const author = await AuthorModel.findOne({
+  //     $or: [{ _id: _id }, payload],
+  //   });
 
-    if (author === null) {
-      const newAuthor = await AuthorModel.create(payload);
-      return res.status(201).json(newAuthor);
-    }
+  //   if (author === null) {
+  //     const newAuthor = await AuthorModel.create(payload);
+  //     return res.status(201).json(newAuthor);
+  //   }
 
-    // found by id
-    if (author.id === _id) {
-      author.first_name = payload.first_name;
-      author.last_name = payload.last_name;
-      await author.save();
+  //   // found by id
+  //   if (author.id === _id) {
+  //     author.first_name = payload.first_name;
+  //     author.last_name = payload.last_name;
+  //     await author.save();
 
-      return res.json(author);
-    }
+  //     return res.json(author);
+  //   }
 
-    // found not by id, redirect
-    const { absolute } = createLocationUrl(req, author.id);
-    console.log("found by id, redirect");
+  //   // found not by id, redirect
+  //   const { absolute } = createLocationUrl(req, author.id);
+  //   console.log("found by id, redirect");
 
-    return res.location(absolute).status(303).end();
-  }
+  //   return res.location(absolute).status(303).end();
+  // }
 
-  async patchOne(req: Request, res: Response, next: NextFunction) {
-    const author = await AuthorModel.findById(res.locals._id);
-    if (author === null) return res.status(404).end();
+  // async patchOne(req: Request, res: Response, next: NextFunction) {
+  //   const author = await AuthorModel.findById(res.locals._id);
+  //   if (author === null) return res.status(404).end();
 
-    const { first_name, last_name } = req.body;
-    if (first_name === author.first_name && last_name === author.last_name) {
-      // already up to date
-      return res.json(author);
-    }
+  //   const { first_name, last_name } = req.body;
+  //   if (first_name === author.first_name && last_name === author.last_name) {
+  //     // already up to date
+  //     return res.json(author);
+  //   }
 
-    if (first_name) author.first_name = first_name;
-    if (last_name) author.last_name = last_name;
-    author.save();
+  //   if (first_name) author.first_name = first_name;
+  //   if (last_name) author.last_name = last_name;
+  //   author.save();
 
-    res.json(author);
-  }
+  //   res.json(author);
+  // }
 
-  async deleteOne(req: Request, res: Response, next: NextFunction) {
-    const author = await AuthorModel.findByIdAndDelete(res.locals._id);
+  // async deleteOne(req: Request, res: Response, next: NextFunction) {
+  //   const author = await AuthorModel.findByIdAndDelete(res.locals._id);
 
-    if (author === null) {
-      return res.status(204).json();
-    }
+  //   if (author === null) {
+  //     return res.status(204).json();
+  //   }
 
-    res.json(author);
-  }
+  //   res.json(author);
+  // }
 }
 
 export default new AuthorsController();

@@ -8,7 +8,7 @@ const router = Router();
 
 router
   .route("/")
-  // .post(wrap(AuthorsController.postOne))
+  .post(wrap(AuthorsController.postOne))
   .get(wrap(AuthorsController.getMany))
   .put(methodNotAllowed)
   .patch(methodNotAllowed)
@@ -16,9 +16,12 @@ router
 
 // router.param("id", validateId);
 
-router.route("/:id").post(methodNotAllowed).get(wrap(AuthorsController.getOne));
-//   .put(wrap(AuthorsController.putOne))
-//   .patch(wrap(AuthorsController.patchOne))
-//   .delete(wrap(AuthorsController.deleteOne));
+router
+  .route("/:id")
+  .post(methodNotAllowed)
+  .get(wrap(AuthorsController.getOne))
+  //   .put(wrap(AuthorsController.putOne))
+  //   .patch(wrap(AuthorsController.patchOne))
+  .delete(wrap(AuthorsController.deleteOne));
 
 export default router;

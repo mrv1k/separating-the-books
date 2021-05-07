@@ -20,33 +20,18 @@ class AuthorsController {
     return res.json(author);
   }
 
-  // async postOne(req: Request, res: Response, next: NextFunction) {
-  //   const payload: Author = {
-  //     first_name: req.body.first_name,
-  //     last_name: req.body.last_name,
-  //   };
+  async postOne(req: Request, res: Response, next: NextFunction) {
+    const payload = {
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+    };
+    const repository = getRepository(Author);
 
-  //   await AuthorModel.validate(payload);
+    const author = repository.create(payload);
+    await repository.save(author);
 
-  //   // can't use .exists() - need object id for url, use equivalent
-  //   const existingAuthor = await AuthorModel.findOne(payload, { _id: 1 })
-  //     .lean()
-  //     .exec();
-
-  //   if (existingAuthor) {
-  //     const location = createLocationUrl(req, existingAuthor._id);
-  //     return res.location(location.absolute).status(409).json({
-  //       error: "Resource already exists",
-  //       location: location.relative,
-  //     });
-  //   }
-
-  //   const author = await new AuthorModel(payload).save({
-  //     validateBeforeSave: false, // validated above
-  //   });
-
-  //   res.location(createLocationUrl(req, author._id).absolute).json(author);
-  // }
+    res.location(createLocationUrl(req, author.id).absolute).json(author);
+  }
 
   // async putOne(req: Request, res: Response, next: NextFunction) {
   //   const _id = res.locals._id;
@@ -98,15 +83,16 @@ class AuthorsController {
   //   res.json(author);
   // }
 
-  // async deleteOne(req: Request, res: Response, next: NextFunction) {
-  //   const author = await AuthorModel.findByIdAndDelete(res.locals._id);
+  async deleteOne(req: Request, res: Response, next: NextFunction) {
+    const repository = getRepository(Author);
+    const deleteResult = await repository.delete(req.params.id);
 
-  //   if (author === null) {
-  //     return res.status(204).json();
-  //   }
+    if (deleteResult.affected === 1) {
+      return res.status(204).end();
+    }
 
-  //   res.json(author);
-  // }
+    next();
+  }
 }
 
 export default new AuthorsController();
